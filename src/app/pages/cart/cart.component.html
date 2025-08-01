@@ -1,0 +1,18 @@
+<h2>Resumen del Pedido</h2>
+
+<div *ngIf="carrito.length > 0; else carritoVacio">
+  <ul>
+    <li *ngFor="let producto of carrito">
+      {{ producto.nombre }} - ${{ producto.precio }}
+    </li>
+  </ul>
+
+  <p><strong>Total:</strong> ${{ total }}</p>
+
+  <button (click)="volverAInicio()">Volver a seguir comprando</button>
+</div>
+
+<ng-template #carritoVacio>
+  <p>El carrito está vacío.</p>
+  <button (click)="volverAInicio()">Volver</button>
+</ng-template>

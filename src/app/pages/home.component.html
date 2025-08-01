@@ -1,0 +1,99 @@
+<div class="container">
+  <h2>Bienvenido a CasaParts</h2>
+  <!-- 🛒 Ícono de carrito fijo -->
+<div
+  style="position: fixed; top: 10px; right: 10px; z-index: 1000; cursor: pointer;"
+  (click)="irAlCarrito()"
+>
+  <img src="assets/images/CarritoCompras.png" alt="Carrito" width="36" height="36" />
+  <span
+    *ngIf="cartService.getCart().length > 0"
+    style="
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+    "
+  >
+    {{ cartService.getCart().length }}
+  </span>
+</div>
+
+
+  <!-- 🔍 Buscador -->
+  <div class="buscador">
+    <input [(ngModel)]="filtro.texto" placeholder="Buscar producto..." />
+    <button (click)="productosFiltrados">
+      🔍
+    </button>
+  </div>
+
+  <!-- 🔘 Filtros -->
+  <div class="filtros">
+    <select [(ngModel)]="filtro.marca">
+      <option value="">Todas las marcas</option>
+      <option>Renault</option>
+      <option>Volkswagen</option>
+      <option>Ford</option>
+    </select>
+
+    <select [(ngModel)]="filtro.rubro">
+      <option value="">Todos los rubros</option>
+      <option>Suspensión</option>
+      <option>Motor</option>
+      <option>Frenos</option>
+    </select>
+
+    <select [(ngModel)]="filtro.modelo">
+      <option value="">Todos los modelos</option>
+      <option>Sandero</option>
+      <option>Renault 12</option>
+      <option>Gol</option>
+      <option>Focus</option>
+    </select>
+
+    <button (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+ <!-- 🏷️ Carrusel de Ofertas -->
+<!-- 🏷️ Carrusel de Ofertas -->
+<!-- 🏷️ Carrusel de Ofertas -->
+<ng-container *ngIf="ofertas && ofertas.length > 0">
+
+  <div id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-inner">
+      <div *ngFor="let oferta of ofertas; let i = index" class="carousel-item text-center" [class.active]="i === 0">
+        <img [src]="oferta.imagen" class="d-block mx-auto" [alt]="oferta.nombre" style="max-height: 150px;" />
+        <h5>Oferta del Mes</h5>
+        <p>
+          <strong>{{ oferta.nombre }}</strong>
+          por <span style="color: red;">${{ oferta.precio | number }}</span>
+        </p>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</ng-container>
+
+
+
+
+  <!-- 🛒 Productos -->
+  <div *ngFor="let producto of productosFiltrados" class="card">
+    <img [src]="producto.imagen" alt="{{producto.nombre}}" />
+    <h4>{{producto.nombre}}</h4>
+    <p class="desc">{{producto.descripcion}}</p>
+    <p class="precio">${{producto.precio | number}}</p>
+    <button class="btn-agregar" (click)="agregarAlCarrito(producto)">Agregar</button>
+
+  </div>
+</div>
