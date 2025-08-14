@@ -75,6 +75,19 @@ export class ApiService {
     );
   }
 
+  busquedaArticulo(cliente: number | null, busqueda: string): Observable<any[]> {
+    return this.http.post<any[]>(`${environment.API_URL}/busqueda/filtro/${cliente}`, { busqueda: busqueda, filtro: "0", lista: null, marca: "", memo: true, modelo: "", rubro: "" }, { responseType: 'json' }).pipe(
+      map(articulos => {
+        console.log(articulos);
+        return articulos;
+      }),
+      catchError(err => {
+        console.error('Error al obtener articulos', err);
+        return of([]);
+      })
+    );
+  }
+
   //servicios de auth_url
   login(cliente: number | null, Email: string, clave: string): Observable<any[]> {
     return this.http.post<any[]>(`${environment.AUTH_URL}/login`, { codigo: cliente, email: Email, password: clave }, { responseType: 'json' }).pipe(
@@ -88,5 +101,6 @@ export class ApiService {
       })
     );
   }
+
 
 }

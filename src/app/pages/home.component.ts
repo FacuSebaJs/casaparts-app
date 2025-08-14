@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
 
   async cargaInicial() {
     await this.cargarnovedades();
-    this.obtenerImagenes();
+    this.obtenerImagenes(this.articulos);
 
   }
 
@@ -66,12 +66,21 @@ export class HomeComponent implements OnInit {
   trackByIndex = (i: number) => i;
   trackByProducto = (_: number, p?: any) => p?.id ?? _;
 
-  buscar() {
-
+  async buscar() {
+    try {
+      const cliente = localStorage.getItem('loginClientNumber');
+      const articulos = await firstValueFrom(this.api.busquedaArticulo(Number(cliente), this.busqueda));
+      console.log(articulos);
+      this.obtenerImagenes(articulos);
+      this.articulos = articulos;
+    } catch (err) {
+      console.error('Error cargando busqueda de articulos', err);
+      throw err;
+    }
   }
 
-  async obtenerImagenes() {
-    for (let articulo of this.articulos) {
+  async obtenerImagenes(articulos: any[]) {
+    for (let articulo of articulos) {
       let imagenes = await this.obtenerImagen(articulo.CODIGO);
       if (imagenes != null) {
         this.imagenes.push(imagenes.formatos.original);
