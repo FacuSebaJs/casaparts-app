@@ -1,90 +1,44 @@
 <div class="container">
   <h2>Bienvenido a CasaParts</h2>
-
   <!-- 🛒 Ícono de carrito fijo -->
   <div
     style="position: fixed; top: 10px; right: 10px; z-index: 1000; background-color: yellow; padding: 5px; border-radius: 8px; cursor: pointer;"
-    (click)="irAlCarrito()"
-  >
+    (click)="irAlCarrito()">
     <img src="assets/images/CarritoCompras.png" alt="Carrito" width="36" height="36" />
-    <span
-      *ngIf="cartLength > 0"
-      style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px;"
-    >
+    <span *ngIf="cartLength > 0"
+      style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px;">
       {{ cartLength }}
     </span>
   </div>
-
   <!-- 🔍 Buscador -->
   <div class="buscador">
-    <input [(ngModel)]="filtro.texto" placeholder="Buscar producto..." />
-    <button type="button" (click)="aplicarFiltro()">🔍</button>
+    <input [(ngModel)]="busqueda" placeholder="Buscar producto..." />
+    <button type="button" (click)="buscar()">🔍</button>
   </div>
-
-  <!-- 🔘 Filtros -->
-  <div class="filtros">
-    <!-- Combo dinámico de marcas -->
-    <select [(ngModel)]="filtro.marca" (change)="onMarcaChange()">
-      <option value="">Todas las marcas</option>
-      <option *ngFor="let marca of marcas" [value]="marca.MARCA">{{ marca.NOMBRE }}</option>
-    </select>
-
-    <!-- 🔘 Filtro Rubros desde API -->
-    <select [(ngModel)]="filtro.rubro" (change)="aplicarFiltro()">
-      <option value="">Todos los rubros</option>
-      <option *ngFor="let rubro of (rubros || [])" [value]="rubro.LI">
-        {{ rubro.TITULO }}
-      </option>
-    </select>
-
-    <select [(ngModel)]="filtro.modelo" (change)="aplicarFiltro()">
-      <option value="">Todos los modelos</option>
-       <option *ngFor="let modelo of (modelos || [])" [value]="modelo.CODIGO">
-        {{ modelo.NOMBRE }}
-      </option>
-      
-    </select>
-
-    <button type="button" (click)="limpiarFiltros()">Limpiar</button>
-  </div>
-
-  <!-- Indicadores de carga y error -->
   <div *ngIf="cargandoProductos" class="text-muted mt-2">Buscando productos...</div>
   <div *ngIf="errorProductos" class="text-danger mt-2">{{ errorProductos }}</div>
-
   <!-- 🏷️ Carrusel de Ofertas -->
-  <ng-container *ngIf="(ofertas?.length ?? 0) > 0">
-  <div id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="3000">
-    <div class="carousel-inner">
-      <div
-        *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex"
-        class="carousel-item text-center"
-        [class.active]="i === 0"
-      >
-         <img src="assets/images/pastillas.png" class="d-block mx-auto" [alt]="" style="max-height: 150px;" /> 
-        <h5 class="mt-2 mb-1">Oferta del Mes</h5>
-        <p>
-          <strong>{{ articulo.DESCRIP }}</strong>
-          <span style="color: red;"> — ${{ articulo.PRECIO | number: '1.2-2' }}</span>
-        </p>
+  <ng-container *ngIf="(articulos?.length ?? 0) > 0">
+    <div id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="3000">
+      <div class="carousel-inner">
+        <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex" class="carousel-item text-center"
+          [class.active]="i === 0">
+          <img src="assets/images/pastillas.png" class="d-block mx-auto" [alt]="" style="max-height: 150px;" />
+          <h5 class="mt-2 mb-1">Oferta del Mes</h5>
+          <p>
+            <strong>{{ articulo.DESCRIP }}</strong>
+          </p>
+        </div>
       </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Siguiente</span>
+      </button>
     </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Siguiente</span>
-    </button>
-  </div>
-</ng-container>
-
-
-  <!-- 🛒 Productos -->
- 
-
-  <!-- 📦 Botón para ir al resumen del carrito -->
+  </ng-container>
   <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button>
 </div>
