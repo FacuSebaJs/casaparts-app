@@ -61,6 +61,21 @@ export class ApiService {
     );
   }
 
+  getUrlImages(codigo: string) {
+    let url: string = `${environment.URL_IMAGES}/getFormatImgArticulo/${codigo}`;
+    return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
+      map(images => {
+        console.log(images);
+        return images;
+      }),
+      catchError(err => {
+        console.error('Error al obtener imagenes', err);
+        return of([]);
+      })
+    );
+  }
+
+  //servicios de auth_url
   login(cliente: number | null, Email: string, clave: string): Observable<any[]> {
     return this.http.post<any[]>(`${environment.AUTH_URL}/login`, { codigo: cliente, email: Email, password: clave }, { responseType: 'json' }).pipe(
       map(credenciales => {

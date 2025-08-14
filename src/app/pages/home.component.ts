@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService } from './cart/cart.service';
 import { ApiService } from '../services/api.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,7 @@ export class HomeComponent implements OnInit {
   errorProductos = '';
   articulos: any[] = [];
   busqueda: string = '';
+  imagenes: string[] = [];
 
   get cartLength(): number {
     return this.cartService.getCart()?.length ?? 0;
@@ -30,25 +32,28 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.cargarnovedades();
+    this.cargaInicial();
   }
 
-  cargarnovedades(): void {
-    // this.cargandoRubros = true;
-    let cliente = localStorage.getItem('loginClientNumber')
-    this.api.getNov(cliente).subscribe({
-      next: articulos => {
-        console.log(articulos);
-        this.articulos = articulos;
+  async cargaInicial() {
+    await this.cargarnovedades();
+    this.obtenerImagenes();
 
-        /*  this.cargandoMarcas = false; */
-      },
-      error: err => {
-        console.error('Error cargando novedaades', err);
-        /* this.cargando = false; */
-      }
-    });
   }
+
+  async cargarnovedades() {
+    try {
+      let cliente = localStorage.getItem('loginClientNumber')
+      const articulos = await firstValueFrom(this.api.getNov(cliente));
+      console.log(articulos);
+      this.articulos = articulos;
+      return articulos;
+    } catch (err) {
+      console.error('Error cargando novedades', err);
+      throw err;
+    }
+  }
+
 
   agregarAlCarrito(p: any): void {
     this.cartService.add(p);
@@ -63,6 +68,30 @@ export class HomeComponent implements OnInit {
 
   buscar() {
 
+  }
+
+  async obtenerImagenes() {
+    for (let articulo of this.articulos) {
+      let imagenes = await this.obtenerImagen(articulo.CODIGO);
+      if (imagenes != null) {
+        this.imagenes.push(imagenes.formatos.original);
+      }
+      else {
+        this.imagenes.push('');
+      }
+    }
+    console.log(this.imagenes);
+  }
+
+  async obtenerImagen(codigo: string) {
+    try {
+      const imagenes = await firstValueFrom(this.api.getUrlImages(codigo));
+      console.log(imagenes);
+      return imagenes[0];
+    } catch (err) {
+      console.error('Error cargando imagen', err);
+      return null;
+    }
   }
 
 }
