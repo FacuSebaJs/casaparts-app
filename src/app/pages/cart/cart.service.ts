@@ -1,40 +1,39 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface CartItem {
+  id?: string | number;
+  [k: string]: any; // flexible para ahora
+}
+
+@Injectable({ providedIn: 'root' })
 export class CartService {
-  public cartItems: any[] = [];
-  public cartCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private cartItems: CartItem[] = [];
+  private cartCount = new BehaviorSubject<number>(0);
 
-  constructor() {}
-
-  agregarProducto(producto: any): void {
-    this.cartItems.push(producto);
+  // ---- API pública unificada
+  add(item: CartItem): void {
+    this.cartItems.push(item);
     this.cartCount.next(this.cartItems.length);
-    console.log('Producto agregado al carrito:', producto);
+    console.log('Producto agregado al carrito:', item);
   }
 
-  obtenerCarrito(): any[] {
+  getCart(): CartItem[] {
     return this.cartItems;
   }
 
-  limpiarCarrito(): void {
+  getCartCount$() {
+    return this.cartCount.asObservable();
+  }
+
+  clearCart(): void {
     this.cartItems = [];
     this.cartCount.next(0);
     console.log('Carrito limpiado.');
   }
 
-  getCart(): any[] {
-    return this.cartItems;
-  }
-
-  getCartCount(): BehaviorSubject<number> {
-    return this.cartCount;
-  }
-
-  clearCart(): void {
-    this.limpiarCarrito(); // método redundante por compatibilidad
-  }
+  // --- Compatibilidad con nombres anteriores (opcional)
+  agregarProducto(producto: any) { this.add(producto); }
+  obtenerCarrito(): any[] { return this.getCart(); }
+  limpiarCarrito(): void { this.clearCart(); }
 }

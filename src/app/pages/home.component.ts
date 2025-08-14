@@ -1,18 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartService } from './cart/cart.service';
-
 import { Router } from '@angular/router';
+import { CartService } from './cart/cart.service';
+import { ApiService, ProductoApi } from '../services/api.service';
+
 
 interface Producto {
+  id: string | number;
   nombre: string;
   descripcion: string;
   precio: number;
   imagen: string;
-  marca: string;
-  rubro: string;
-  modelo: string;
+  marca?: string;
+  rubro?: string;
+  modelo?: string;
+}
+
+interface Oferta {
+  imagen: string;
+  nombre: string;
+  precio: number;
+}
+
+interface RubroApi {
+  TITULO: string;
 }
 
 @Component({
@@ -20,108 +32,200 @@ interface Producto {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
-  selectedMarca: string = '';
-selectedModelo: string = '';
-selectedRubro: string = '';
+export class HomeComponent implements OnInit {
+  // Carrusel y filtros
+  ofertas: Oferta[] = [];
+  rubrosDesdeApi: RubroApi[] = [];
+  marcas: {NOMBRE: string, MARCA: string}[] = [];
 
-  productos: Producto[] = [
-    {
-      nombre: 'Resorte Espiral Delantero',
-      descripcion: 'Suspensión delantera Renault',
-      precio: 5623,
-      imagen: 'assets/images/ResorteEspiral.png',
-      marca: 'Renault',
-      rubro: 'Suspensión',
-      modelo: 'Sandero'
-    },
-    {
-      nombre: 'Alternador Renault 70 A',
-      descripcion: 'Alternador de 70 amperes para Renault 12',
-      precio: 57986,
-      imagen: 'assets/images/alternador.png',
-      marca: 'Renault',
-      rubro: 'Motor',
-      modelo: 'Renault 12'
-    },
-    {
-      nombre: 'Pastillas de Freno Delanteras',
-      descripcion: 'Juego de pastillas de freno delanteras',
-      precio: 16203,
-      imagen: 'assets/images/pastillas.png',
-      marca: 'Volkswagen',
-      rubro: 'Frenos',
-      modelo: 'Gol'
-    },
-    {
-      nombre: 'Bieleta',
-      descripcion: 'Bieleta de suspensión trasera',
-      precio: 4770,
-      imagen: 'assets/images/bieleta.png',
-      marca: 'Ford',
-      rubro: 'Suspensión',
-      modelo: 'Focus'
-    }
-  ];
+  // Estados de carga/error
+  cargandoProductos = false;
+  errorProductos = '';
+  cargandoMarcas = false;
+  rubros: {LI:string,TITULO:string}[]=[];
+  modelos: {CODIGO: string, NOMBRE: string}[]=[];
+  articulos: any;
+novedad2: any;
+
+
+  get cartLength(): number {
+    return this.cartService.getCart()?.length ?? 0;
+  }
+
+  // Dataset base (se setea desde API o mock)
+  private productos = signal<Producto[]>([]);
 
   filtro = {
     texto: '',
     marca: '',
     rubro: '',
-    modelo: ''
+    modelo: '',
   };
 
-  // ✅ Propiedad ofertas para el carrusel
-  ofertas = [
-    {
-      nombre: 'Resorte Espiral',
-      precio: 4999,
-      imagen: 'assets/images/ResorteEspiral.png'
-    },
-    {
-      nombre: 'Alternador 70A',
-      precio: 49900,
-      imagen: 'assets/images/alternador.png'
-    },
-    {
-      nombre: 'Pastillas Delanteras',
-      precio: 14500,
-      imagen: 'assets/images/pastillas.png'
-    }
-  ];
+  productosFiltrados = computed<Producto[]>(() => {
+    const base = this.productos();
+    const t = this.filtro.texto?.toLowerCase() || '';
+    const m = this.filtro.marca || '';
+    const r = this.filtro.rubro || '';
+    const mo = this.filtro.modelo || '';
 
-  constructor(public cartService: CartService, private router: Router) {}
-
-  get productosFiltrados(): Producto[] {
-    return this.productos.filter(producto => {
-      return (
-        producto.nombre.toLowerCase().includes(this.filtro.texto.toLowerCase()) &&
-        (this.filtro.marca === '' || producto.marca === this.filtro.marca) &&
-        (this.filtro.rubro === '' || producto.rubro === this.filtro.rubro) &&
-        (this.filtro.modelo === '' || producto.modelo === this.filtro.modelo)
-      );
+    return base.filter(p => {
+      const passTexto =
+        !t ||
+        p.nombre.toLowerCase().includes(t) ||
+        p.descripcion?.toLowerCase().includes(t);
+      const passMarca = !m || p.marca === m;
+      const passRubro = !r || p.rubro === r;
+      const passModelo = !mo || p.modelo === mo;
+      return passTexto && passMarca && passRubro && passModelo;
     });
+  });
+
+  constructor(
+    private router: Router,
+    public cartService: CartService,
+    private api: ApiService
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarMarcas();
+    this.cargarRubros();
+    this.cargarModelos();
+    this.cargarnovedades();
+   
+
+
+
+    // Mock rubros y ofertas para la demo
+    this.rubrosDesdeApi = [
+      { TITULO: 'Suspensión' },
+      { TITULO: 'Frenos' },
+      { TITULO: 'Motor' },
+    ];
+
+    this.ofertas = [
+      { imagen: 'assets/images/oferta1.png', nombre: 'Pastillas de Freno', precio: 24999 },
+      { imagen: 'assets/images/oferta2.png', nombre: 'Bieleta', precio: 18999 },
+    ];
+
+    // Dataset inicial mock
+    this.productos.set([
+      { id: 1, nombre: 'Resorte espiral', descripcion: 'Para Sandero', precio: 35000, imagen: 'assets/images/resorte.png', marca: 'Renault', rubro: 'Suspensión', modelo: 'Sandero' },
+      { id: 2, nombre: 'Pastillas de freno', descripcion: 'Delanteras',  precio: 27000, imagen: 'assets/images/pastillas.png', marca: 'Volkswagen', rubro: 'Frenos', modelo: 'Gol' },
+    ]);
+  }
+
+  cargarMarcas(): void {
+    this.cargandoMarcas = true;
+    this.api.getMarcas().subscribe({
+      next: lista => {
+        console.log(lista);
+        this.marcas = lista;
+        this.cargandoMarcas = false;
+      },
+      error: err => {
+        console.error('Error cargando marcas', err);
+        this.cargandoMarcas = false;
+      }
+    });
+  }
+
+  cargarRubros(): void {
+    // this.cargandoRubros = true;
+    this.api.getRubros().subscribe({
+      next: lista => {
+        console.log(lista);
+        this.rubros = lista;
+       /*  this.cargandoMarcas = false; */
+      },
+      error: err => {
+        console.error('Error cargando rubros', err);
+        /* this.cargando = false; */
+      }
+    });
+  }
+
+  cargarnovedades(): void {
+    // this.cargandoRubros = true;
+    let cliente=localStorage.getItem('loginClientNumber')
+    this.api.getNov(cliente).subscribe({
+      next: articulos => {
+        console.log(articulos);
+        this.articulos = articulos;
+      
+       /*  this.cargandoMarcas = false; */
+      },
+      error: err => {
+        console.error('Error cargando novedaades', err);
+        /* this.cargando = false; */
+      }
+    });
+  }
+  cargarModelos(): void {
+    // this.cargandoModelos = true;
+    this.api.getModelos().subscribe({
+      next: lista => {
+        console.log(lista);
+        this.modelos = lista;
+        // this.cargarModelos = false;
+      },
+      error: err => {
+        console.error('Error cargando modelos', err);
+        // this.cargandoModelos = false;
+      }
+    });
+  }
+
+  onMarcaChange(): void {
+    if (!this.filtro.marca) {
+      // Volver a productos iniciales si se elige "Todas las marcas"
+      this.productos.set([
+        { id: 1, nombre: 'Resorte espiral', descripcion: 'Para Sandero', precio: 35000, imagen: 'assets/images/resorte.png', marca: 'Renault', rubro: 'Suspensión', modelo: 'Sandero' },
+        { id: 2, nombre: 'Pastillas de freno', descripcion: 'Delanteras', precio: 27000, imagen: 'assets/images/pastillas.png', marca: 'Volkswagen', rubro: 'Frenos', modelo: 'Gol' },
+      ]);
+      return;
+    }
+
+    this.cargandoProductos = true;
+    this.api.getProductosPorMarca(this.filtro.marca).subscribe({
+      next: (listaApi: ProductoApi[]) => {
+        const mapeados: Producto[] = (listaApi || []).map((x, idx) => ({
+          id: x.ID ?? `${this.filtro.marca}-${idx}`,
+          nombre: x.NOMBRE ?? 'Producto',
+          descripcion: x.DESCRIPCION ?? '',
+          precio: Number(x.PRECIO ?? 0),
+          imagen: x.IMAGEN || 'assets/images/placeholder.png',
+          marca: x.MARCA ?? this.filtro.marca,
+          rubro: x.RUBRO ?? '',
+          modelo: x.MODELO ?? ''
+        }));
+        this.productos.set(mapeados);
+        this.cargandoProductos = false;
+      },
+      error: err => {
+        console.error(err);
+        this.errorProductos = 'No se pudieron cargar productos para la marca seleccionada.';
+        this.cargandoProductos = false;
+      }
+    });
+  }
+
+  aplicarFiltro(): void {}
+
+  limpiarFiltros(): void {
+    this.filtro = { texto: '', marca: '', rubro: '', modelo: '' };
+  }
+
+  agregarAlCarrito(p: Producto): void {
+    this.cartService.add(p);
   }
 
   irAlCarrito(): void {
     this.router.navigate(['/cart']);
   }
 
-  agregarAlCarrito(producto: Producto): void {
-    this.cartService.agregarProducto(producto);
-  }
-
-  limpiarFiltros() {
-  // Resetear filtros (ya implementado)
-  this.selectedMarca = '';
-  this.selectedModelo = '';
-  this.selectedRubro = '';
-
-  // Resetear carrito
-  this.cartService.clearCart();
+  trackByIndex = (i: number) => i;
+  trackByProducto = (_: number, p?: Producto) => p?.id ?? _;
 }
-
-}
-
