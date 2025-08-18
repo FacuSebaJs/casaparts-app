@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mobile-casaparts-app-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - mobile.joinlabs.com.ar
+      secretName: tls-joinlabs
+  rules:
+    - host: mobile.joinlabs.com.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mobile-casaparts-service
+                port:
+                  number: 80

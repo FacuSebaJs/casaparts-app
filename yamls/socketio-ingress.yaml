@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: socketio-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/enable-websocket: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - mobile.joinlabs.com.ar
+      secretName: tls-joinlabs
+  rules:
+    - host: mobile.joinlabs.com.ar
+      http:
+        paths:
+          - path: /socket.io
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-back-service
+                port:
+                  number: 8085

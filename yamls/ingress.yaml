@@ -1,0 +1,74 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mobile-casaparts-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - mobile.joinlabs.com.ar
+      secretName: tls-joinlabs
+  rules:
+    - host: mobile.joinlabs.com.ar
+      http:
+        paths:
+          # Ruta principal (comentada por ahora)
+          # - path: /
+          #   pathType: Prefix
+          #   backend:
+          #     service:
+          #       name: mobile-casaparts-service
+          #       port:
+          #         number: 80
+
+          # Ruta de autenticación (comentada por ahora)
+          - path: "/auth(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-auth-service
+                port:
+                  number: 80
+          - path: "/back(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-back-service
+                port:
+                  number: 80
+          # Rutas para archivos estáticos (usando patrones dinámicos)
+          - path: /assets/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-casaparts-service
+                port:
+                  number: 80
+
+          - path: /scripts/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-casaparts-service
+                port:
+                  number: 80
+
+          - path: /styles*.css
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mobile-casaparts-service
+                port:
+                  number: 80
+
+          # Ruta general para la aplicación (comentada por ahora)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mobile-casaparts-service
+                port:
+                  number: 80

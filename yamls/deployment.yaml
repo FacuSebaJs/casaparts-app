@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mobile-casaparts
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mobile-casaparts
+  template:
+    metadata:
+      labels:
+        app: mobile-casaparts
+    spec:
+      containers:
+        - name: mobile-casaparts
+          image: 481665096185.dkr.ecr.us-east-1.amazonaws.com/mobile-casaparts:latest
+          ports:
+            - containerPort: 80

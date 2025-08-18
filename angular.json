@@ -22,9 +22,12 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
+	      "src/manifest.webmanifest",
+	      "src/favicon.ico",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+		"output": "/assets"
               }
             ],
             "styles": [
@@ -109,5 +112,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
