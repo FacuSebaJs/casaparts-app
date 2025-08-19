@@ -5,10 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build:prod --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "build:ssr": "ng build && ng run casa-del-renault:server",
-    "serve:ssr": "node dist/casa-del-renault-server/main.js"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -19,12 +18,9 @@
     "@angular/forms": "^19.1.0",
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
-    "@angular/platform-server": "^19.1.0",
     "@angular/router": "^19.1.0",
     "@angular/service-worker": "^19.2.14",
-    "@angular/ssr": "^19.1.5",
     "bootstrap": "^5.3.7",
-    "express": "^4.21.2",
     "rxjs": "~7.8.0",
     "swiper": "^11.2.10",
     "tslib": "^2.3.0",
