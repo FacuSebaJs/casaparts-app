@@ -1,13 +1,42 @@
 {
-  "name": "Casaparts - La Casa Del Renault",
-  "short_name": "Casaparts",
-  "start_url": "/",
-  "scope": "/",
+  "name": "casa-del-renault",
+  "short_name": "casa-del-renault",
   "display": "standalone",
-  "background_color": "#fcd12a",
-  "theme_color": "#fcd12a",
-  "orientation": "portrait",
+  "scope": "./",
+  "start_url": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
   "icons": [
+    {
+      "src": "assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
     {
       "src": "assets/icons/icon-192x192.png",
       "sizes": "192x192",
