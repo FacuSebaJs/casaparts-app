@@ -2,8 +2,8 @@
   "name": "casa-del-renault",
   "short_name": "casa-del-renault",
   "display": "standalone",
-  "scope": "./",
-  "start_url": "./",
+  "scope": "/",
+  "start_url": "/",
   "background_color": "#ffffff",
   "theme_color": "#1976d2",
   "icons": [
