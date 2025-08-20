@@ -8,8 +8,8 @@ export const appConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }) // 👈 Esto registra correctamente HttpClient
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
 };

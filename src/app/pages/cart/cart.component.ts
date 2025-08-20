@@ -24,10 +24,10 @@ export class CartComponent implements OnInit {
   confirmarPedido() {
     alert('¡Pedido confirmado!');
     this.cartService.clearCart();
-    this.router.navigate(['/']); // o a login si preferís
+    this.router.navigate(['/']);
   }
 
   volver() {
-    this.router.navigate(['/']); // a Home o a donde quieras
+    this.router.navigate(['/']);
   }
 }

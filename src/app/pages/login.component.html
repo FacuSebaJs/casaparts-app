@@ -1,4 +1,3 @@
-<!-- src/app/pages/login.component.html -->
 <div class="login-container">
   <img src="assets/images/Casaparts_logo2.png" alt="Casaparts Logo" class="logo" />
   <div class="login-box">
@@ -8,17 +7,15 @@
         <label>Nº de Cliente</label>
         <input type="text" class="form-control" [(ngModel)]="cliente" name="cliente" placeholder="Ej: 12345" required />
       </div>
-
       <div class="mb-3">
         <label>Email</label>
-        <input type="email" class="form-control" [(ngModel)]="Email" name="email" placeholder="correo@ejemplo.com" required />
+        <input type="email" class="form-control" [(ngModel)]="Email" name="email" placeholder="correo@ejemplo.com"
+          required />
       </div>
-
       <div class="mb-3">
         <label>Código de Acceso</label>
         <input type="password" class="form-control" [(ngModel)]="clave" name="clave" placeholder="••••••••" required />
       </div>
-
       <button type="submit" class="btn btn-warning w-100 fw-bold">Ingresar</button>
     </form>
   </div>

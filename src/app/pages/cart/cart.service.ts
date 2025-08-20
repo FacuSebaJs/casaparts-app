@@ -11,7 +11,6 @@ export class CartService {
   private cartItems: CartItem[] = [];
   private cartCount = new BehaviorSubject<number>(0);
 
-  // ---- API pública unificada
   add(item: CartItem): void {
     this.cartItems.push(item);
     this.cartCount.next(this.cartItems.length);
@@ -32,7 +31,6 @@ export class CartService {
     console.log('Carrito limpiado.');
   }
 
-  // --- Compatibilidad con nombres anteriores (opcional)
   agregarProducto(producto: any) { this.add(producto); }
   obtenerCarrito(): any[] { return this.getCart(); }
   limpiarCarrito(): void { this.clearCart(); }

@@ -6,7 +6,6 @@ import { environment } from './environments/environment';
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
 
-// Registro manual del Service Worker (solo en producción)
 if (environment.production && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('ngsw-worker.js')

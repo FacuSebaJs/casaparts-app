@@ -84,6 +84,7 @@ h2 {
   border-radius: 8px;
   cursor: pointer;
 }
+
 .carousel-item img {
   max-height: 150px;
   object-fit: contain;
@@ -97,7 +98,7 @@ h2 {
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   background: black;
-  background-color: black;  
+  background-color: black;
 }
 
 .carousel-control-prev-icon {

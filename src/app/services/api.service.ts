@@ -8,6 +8,8 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   constructor(private http: HttpClient) { }
 
+  // SERVICIOS DE API_URL
+
   getMarcas(): Observable<{ NOMBRE: string, MARCA: string }[]> {
     return this.http.get<{ NOMBRE: string, MARCA: string }[]>(`${environment.API_URL}/marcas`, { responseType: 'json' }).pipe(
       map(marcas => {
@@ -38,7 +40,6 @@ export class ApiService {
   getRubros(): Observable<{ LI: string, TITULO: string }[]> {
     return this.http.get<{ LI: string, TITULO: string }[]>(`${environment.API_URL}/rubros`, { responseType: 'json' }).pipe(
       map(rubros => {
-        console.log(rubros);
         return rubros;
       }),
       catchError(err => {
@@ -51,7 +52,6 @@ export class ApiService {
   getModelos(): Observable<{ CODIGO: string, NOMBRE: string }[]> {
     return this.http.get<{ CODIGO: string, NOMBRE: string }[]>(`${environment.API_URL}/auto`, { responseType: 'json' }).pipe(
       map(modelos => {
-        console.log(modelos);
         return modelos;
       }),
       catchError(err => {
@@ -65,7 +65,6 @@ export class ApiService {
     let url: string = `${environment.URL_IMAGES}/getFormatImgArticulo/${codigo}`;
     return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
       map(images => {
-        //console.log(images);
         return images;
       }),
       catchError(err => {
@@ -78,7 +77,6 @@ export class ApiService {
   busquedaArticulo(cliente: number | null, busqueda: string): Observable<any[]> {
     return this.http.post<any[]>(`${environment.API_URL}/busqueda/filtro/${cliente}`, { busqueda: busqueda, filtro: "0", lista: null, marca: "", memo: true, modelo: "", rubro: "" }, { responseType: 'json' }).pipe(
       map(articulos => {
-        console.log(articulos);
         return articulos;
       }),
       catchError(err => {
@@ -88,11 +86,11 @@ export class ApiService {
     );
   }
 
-  //servicios de auth_url
+  // SERVICIOS DE AUTH_URL
+
   login(cliente: number | null, Email: string, clave: string): Observable<any[]> {
     return this.http.post<any[]>(`${environment.AUTH_URL}/login`, { codigo: cliente, email: Email, password: clave }, { responseType: 'json' }).pipe(
       map(credenciales => {
-        console.log(credenciales);
         return credenciales;
       }),
       catchError(err => {
