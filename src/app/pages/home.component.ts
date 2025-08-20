@@ -66,16 +66,16 @@ export class HomeComponent implements OnInit {
             const items = Array.from(el.querySelectorAll('.carousel-item'));
             const currentIndex = items.indexOf(activeItem as Element);
             console.log('Índice actual:', currentIndex);
-            if (this.articulos[currentIndex]&& this.imagenes[currentIndex]=='') {
+            if (this.articulos[currentIndex] && this.imagenes[currentIndex] == '') {
               const resp = await this.obtenerImagen(currentIndex);
               console.log(resp)
               this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
             }
           });
         } else {
-          setTimeout(()=>{
+          setTimeout(() => {
             this.initCarrusel();
-          },1000)
+          }, 1000)
           console.error('Carrusel no disponible en el DOM');
         }
       });
@@ -179,11 +179,9 @@ export class HomeComponent implements OnInit {
       if (imagenes && imagenes.length > 0) {
 
         return imagenes[0];
-
-      } else {
-
+      }
+      else {
         return null; // o un objeto vacío, si prefieres
-
       }
 
     } catch (err) {
