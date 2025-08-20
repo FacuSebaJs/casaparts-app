@@ -65,7 +65,7 @@ export class ApiService {
     let url: string = `${environment.URL_IMAGES}/getFormatImgArticulo/${codigo}`;
     return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
       map(images => {
-        console.log(images);
+        //console.log(images);
         return images;
       }),
       catchError(err => {
