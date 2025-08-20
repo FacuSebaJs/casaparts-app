@@ -73,6 +73,9 @@ export class HomeComponent implements OnInit {
             }
           });
         } else {
+          setTimeout(()=>{
+            this.initCarrusel();
+          },1000)
           console.error('Carrusel no disponible en el DOM');
         }
       });
@@ -80,7 +83,7 @@ export class HomeComponent implements OnInit {
   }
 
   async cargaInicial() {
-    //await this.cargarnovedades();
+    await this.cargarnovedades();
     //this.obtenerImagenes(this.articulos);
 
   }
@@ -90,6 +93,7 @@ export class HomeComponent implements OnInit {
       let cliente = localStorage.getItem('loginClientNumber')
       const articulos = await firstValueFrom(this.api.getNov(cliente));
       console.log(articulos);
+      await this.obtenerImagenes(articulos);
       this.articulos = articulos;
       return articulos;
     } catch (err) {
