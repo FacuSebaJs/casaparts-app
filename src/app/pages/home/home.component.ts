@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   imagenes: string[] = [];
   spinner: boolean = false;
   configCliente: { general: number, contado: number, tarjeta: number, descuento: number } = { general: 0, contado: 0, tarjeta: 0, descuento: 0 };
-  precios: { costo: number, venta: number, contado: number, tarjeta: number }[] = [];
+  precios: { costo: number | null, venta: number | null, contado: number | null, tarjeta: number | null }[] = [];
   private cancelador$ = new Subject<void>();
 
   constructor(
@@ -62,16 +62,8 @@ export class HomeComponent implements OnInit {
             const activeItem = el.querySelector('.carousel-item.active');
             const items = Array.from(el.querySelectorAll('.carousel-item'));
             const currentIndex = items.indexOf(activeItem as Element);
-            if (this.articulos[currentIndex]) {
-              if (this.imagenes[currentIndex] == '') {
-                const resp = await this.obtenerImagen(currentIndex);
-                this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
-              }
-              if (this.precios[currentIndex] == null) {
-                const precios = await this.calcularPrecio(this.articulos[currentIndex]);
-                this.precios[currentIndex] = precios;
-              }
-            }
+            this.actualizarDatos(currentIndex);
+
           });
         } else {
           setTimeout(() => {
@@ -83,9 +75,23 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  async actualizarDatos(currentIndex: number) {
+    if (this.articulos[currentIndex]) {
+      if (this.imagenes[currentIndex] == '') {
+        const resp = await this.obtenerImagen(currentIndex);
+        this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
+      }
+      if (this.precios[currentIndex] == null || this.precios[currentIndex].costo == null) {
+        const precios = await this.calcularPrecio(this.articulos[currentIndex]);
+        this.precios[currentIndex] = precios;
+      }
+    }
+  }
+
   async cargaInicial() {
     await this.cargarConfigCliente();
     await this.cargarnovedades();
+    await this.actualizarDatos(0);
   }
 
   agregarAlCarrito(p: any): void {
@@ -102,7 +108,7 @@ export class HomeComponent implements OnInit {
   async cargarDatosVacios(articulos: any[]) {
     this.articulos = [];
     this.imagenes = Array(articulos.length).fill("");
-    this.precios = Array(articulos.length).fill(null);
+    this.precios = Array(articulos.length).fill({ costo: null, venta: null, contado: null, tarjeta: null });
     this.cancelador$.next();
     setTimeout(() => this.initCarrusel());
   }

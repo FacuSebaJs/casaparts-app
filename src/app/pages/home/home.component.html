@@ -1,6 +1,5 @@
 <div class="container">
   <h2>Bienvenido a CasaParts</h2>
-  <!-- 🛒 Ícono de carrito fijo -->
   <div
     style="position: fixed; top: 10px; right: 10px; z-index: 1000; background-color: yellow; padding: 5px; border-radius: 8px; cursor: pointer;"
     (click)="irAlCarrito()">
@@ -10,7 +9,6 @@
       {{ cartLength }}
     </span>
   </div>
-  <!-- 🔍 Buscador -->
   <div class="buscador">
     <input [(ngModel)]="busqueda" placeholder="Buscar producto..." />
     <button type="button" (click)="buscar()">🔍</button>
@@ -20,30 +18,62 @@
   <div [hidden]="!spinner" class="spinner-border spinner-border-sm" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
-  <!-- 🏷️ Carrusel de Ofertas -->
   <ng-container>
     <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
-      data-bs-interval="3000">
+      data-bs-interval="30000">
       <div class="carousel-inner" style="width: 100%; height: auto;">
         <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex" class="carousel-item text-center"
           [class.active]="i === 0">
-          <img *ngIf="imagenes[i]=='' || imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
-            [alt]="" style="width: 100%; height: 100%;" />
-          <img *ngIf="imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto" [alt]=""
-            style="width: 100%; height: auto;" />
-          <p>
-            <strong>{{ articulo.DESCRIP }}</strong>
-          </p>
+          <div style="position: relative;">
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Siguiente</span>
+            </button>
+            <img *ngIf="!imagenes[i]" src="assets/images/not_found.png" class="d-block mx-auto" alt="Sin foto"
+              style="width: 100%; height: 150px;" />
+            <img *ngIf="imagenes[i]" [src]="imagenes[i]" class="d-block mx-auto" alt=""
+              style="width: 100%; height: 150px;" />
+          </div>
+          <div class="small text-start mx-auto" style="max-width: 560px;">
+            <div class="d-flex justify-content-between mb-2" style="text-align: right; white-space: nowrap;">
+              <span class="text-muted">Descripción:</span>
+              <span class="fw-semibold">{{ articulo.DESCRIP }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Marca:</span>
+              <span class="fw-semibold">{{ articulo.MARCA }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Código:</span>
+              <span class="fw-semibold">{{ articulo.CODIGO }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">N° Original:</span>
+              <span class="fw-semibold">{{ articulo.ORIGINAL }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">COSTO:</span>
+              <span class="fw-semibold">{{ precios[i].costo }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">CONTADO:</span>
+              <span class="fw-semibold">{{ precios[i].contado }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">TARJETA:</span>
+              <span class="fw-semibold">{{ precios[i].tarjeta }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">VENTA:</span>
+              <span class="fw-semibold">{{ precios[i].venta }}</span>
+            </div>
+          </div>
         </div>
       </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Anterior</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Siguiente</span>
-      </button>
     </div>
   </ng-container>
   <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button>
