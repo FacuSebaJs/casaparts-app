@@ -48,4 +48,16 @@ export class ArticuloService {
         );
     }
 
+    getCoefArt(cliente: number | null, codigo: string): Observable<any> {
+        return this.http.get<any>(`${environment.API_URL}/art_coef/getByClientArticle/${cliente}/${codigo}`, { responseType: 'json' }).pipe(
+            map(coeficientes => {
+                return coeficientes;
+            }),
+            catchError(err => {
+                console.error('Error al obtener coeficientes', err);
+                return of([]);
+            })
+        );
+    }
+
 }

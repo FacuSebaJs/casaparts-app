@@ -8,16 +8,27 @@ import { environment } from '../../../../environments/environment';
 export class ConfigClienteService {
     constructor(private http: HttpClient) { }
 
-    getConfigCliente(cliente: any): Observable<any[]> {
-        let url: string = `${environment.API_URL}/busqueda/nov-off/${cliente}`;
-
+    getConfig(cliente: any): Observable<any> {
+        let url: string = `${environment.API_URL}/config_cliente/${cliente}`;
         return this.http.get<any>(url, { responseType: 'json' }).pipe(
-            map(articulos => {
-
-                return articulos;
+            map(config => {
+                return config;
             }),
             catchError(err => {
-                console.error('Error al obtener articulos', err);
+                console.error('Error al obtener configuración de cliente', err);
+                return of([]);
+            })
+        );
+    }
+
+    setConfig(cliente: any): Observable<any> {
+        let url: string = `${environment.API_URL}/config_cliente/${cliente}`;
+        return this.http.patch<any>(url, { responseType: 'json' }).pipe(
+            map(response => {
+                return response.body;
+            }),
+            catchError(err => {
+                console.error('Error al guardar configuración de cliente', err);
                 return of([]);
             })
         );
