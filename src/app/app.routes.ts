@@ -1,10 +1,19 @@
-import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login.component';
-import { HomeComponent } from './pages/home.component';
-import { CartComponent } from './pages/cart/cart.component';
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
 
-export const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'cart', component: CartComponent },
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule)
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}

@@ -1,16 +1,13 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService } from './cart/cart.service';
-import { ApiService } from '../services/api.service';
+import { CartService } from '../order/cart.service';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { ArticuloService } from '../../core/services/api/articulo.service';
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  standalone: false,  
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
@@ -28,9 +25,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     public cartService: CartService,
-    private api: ApiService
+    private _articuloService: ArticuloService
   ) { }
-  
+
   get cartLength(): number {
     return this.cartService.getCart()?.length ?? 0;
   }
@@ -84,7 +81,7 @@ export class HomeComponent implements OnInit {
   async cargarnovedades() {
     try {
       let cliente = localStorage.getItem('loginClientNumber')
-      const articulos = await firstValueFrom(this.api.getNov(cliente));
+      const articulos = await firstValueFrom(this._articuloService.getNov(cliente));
       await this.obtenerImagenes(articulos);
       this.articulos = articulos;
       return articulos;
@@ -111,7 +108,7 @@ export class HomeComponent implements OnInit {
       this.spinner = true;
       this.pausarCarrusel();
       const cliente = localStorage.getItem('loginClientNumber');
-      const articulos = await firstValueFrom(this.api.busquedaArticulo(Number(cliente), this.busqueda));
+      const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(cliente), this.busqueda));
       await this.obtenerImagenes(articulos);
       this.reanudarCarrusel();
       this.articulos = articulos;
@@ -134,7 +131,7 @@ export class HomeComponent implements OnInit {
   async obtenerImagen(index: number) {
 
     try {
-      const imagenes = await this.api.getUrlImages(this.articulos[index].CODIGO)
+      const imagenes = await this._articuloService.getUrlImages(this.articulos[index].CODIGO)
         .pipe(takeUntil(this.cancelador$))
         .toPromise();
       if (imagenes && imagenes.length > 0) {

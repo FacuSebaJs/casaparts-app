@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { ApiService } from '../services/api.service';
-import { response } from 'express';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  standalone: false,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -17,10 +13,10 @@ export class LoginComponent {
   clave: string = '';
   Email: string = '';
 
-  constructor(private router: Router, private api: ApiService) { }
+  constructor(private router: Router, private _authService: AuthService) { }
 
   ingresar() {
-    this.api.login(this.cliente, this.Email, this.clave).subscribe({
+    this._authService.login(this.cliente, this.Email, this.clave).subscribe({
       next: (response: any) => {
         if (response.acceso_permitido == true) {
           localStorage.setItem('loginClientNumber', this.cliente?.toString() || '');
