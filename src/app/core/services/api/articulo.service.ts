@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -29,8 +29,15 @@ export class ArticuloService {
             map(images => {
                 return images;
             }),
-            catchError(err => {
-                console.error('Error al obtener imagenes', err);
+            catchError((err) => {
+                if (err instanceof HttpErrorResponse) {
+                    if (err.status != 502) {
+                        console.error('Error al obtener imagenes', err);
+                    }
+                }
+                else {
+                    console.error('Error al obtener imagenes', err);
+                }
                 return of([]);
             })
         );

@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
 import { CartService } from '../order/cart.service';
-import { firstValueFrom, lastValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 declare var bootstrap: any;
@@ -12,7 +12,7 @@ declare var bootstrap: any;
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('carouselOfertas', { static: false }) carouselElement!: ElementRef;
   carouselInstance: any;
   cargandoProductos = false;
@@ -23,7 +23,9 @@ export class HomeComponent implements OnInit {
   spinner: boolean = false;
   configCliente: { general: number, contado: number, tarjeta: number, descuento: number } = { general: 0, contado: 0, tarjeta: 0, descuento: 0 };
   precios: { costo: number | null, venta: number | null, contado: number | null, tarjeta: number | null }[] = [];
+  indexImagen: number = 0;
   private cancelador$ = new Subject<void>();
+  private slideListener: any;
 
   constructor(
     private router: Router,
@@ -40,38 +42,44 @@ export class HomeComponent implements OnInit {
     this.cargaInicial();
   }
 
+  ngOnDestroy(): void {
+    this.removeListener();
+  }
+
   ngAfterViewInit(): void {
     this.initCarrusel();
-    const carouselEl = document.getElementById('carouselOfertas');
-    carouselEl?.addEventListener('slid.bs.carousel', () => {
-      const activeSlide = carouselEl.querySelector('.carousel-item.active');
-      const allSlides = Array.from(carouselEl.querySelectorAll('.carousel-item'));
-      const currentIndex = allSlides.indexOf(activeSlide as Element);
-    });
   }
 
   initCarrusel() {
+    this.removeListener();
     if (this.carouselInstance) {
       this.carouselInstance.dispose();
     }
-    else {
-      setTimeout(() => {
-        const el = this.carouselElement?.nativeElement;
-        if (el) {
-          el.addEventListener('slid.bs.carousel', async () => {
-            const activeItem = el.querySelector('.carousel-item.active');
-            const items = Array.from(el.querySelectorAll('.carousel-item'));
-            const currentIndex = items.indexOf(activeItem as Element);
-            this.actualizarDatos(currentIndex);
+    setTimeout(() => {
+      const el = this.carouselElement?.nativeElement;
+      if (el) {
+        this.carouselInstance = new bootstrap.Carousel(el);
+        this.slideListener = async () => {
+          this.pausarCarrusel();
+          const activeItem = el.querySelector('.carousel-item.active');
+          const items = Array.from(el.querySelectorAll('.carousel-item'));
+          const currentIndex = items.indexOf(activeItem as Element);
+          this.indexImagen = currentIndex;
+          this.spinner = true;
+          await this.actualizarDatos(currentIndex);
+          this.spinner = false;
+          this.reanudarCarrusel();
+        };
+        el.addEventListener('slid.bs.carousel', this.slideListener);
+      }
+    });
+  }
 
-          });
-        } else {
-          setTimeout(() => {
-            this.initCarrusel();
-          }, 5000)
-          console.error('Carrusel no disponible en el DOM');
-        }
-      });
+  removeListener() {
+    const el = this.carouselElement?.nativeElement;
+    if (el && this.slideListener) {
+      el.removeEventListener('slid.bs.carousel', this.slideListener);
+      this.slideListener = null;
     }
   }
 
@@ -89,9 +97,12 @@ export class HomeComponent implements OnInit {
   }
 
   async cargaInicial() {
+    this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();
     await this.actualizarDatos(0);
+    this.spinner = false;
+    this.reanudarCarrusel();
   }
 
   agregarAlCarrito(p: any): void {
@@ -103,14 +114,12 @@ export class HomeComponent implements OnInit {
   }
 
   trackByIndex = (i: number) => i;
-  trackByProducto = (_: number, p?: any) => p?.id ?? _;
 
   async cargarDatosVacios(articulos: any[]) {
     this.articulos = [];
     this.imagenes = Array(articulos.length).fill("");
     this.precios = Array(articulos.length).fill({ costo: null, venta: null, contado: null, tarjeta: null });
     this.cancelador$.next();
-    setTimeout(() => this.initCarrusel());
   }
 
   pausarCarrusel() {
@@ -127,8 +136,8 @@ export class HomeComponent implements OnInit {
 
   async obtenerImagen(index: number) {
     try {
-      const imagenes = await lastValueFrom(this._articuloService.getUrlImages(this.articulos[index].CODIGO)
-        .pipe(takeUntil(this.cancelador$)))
+      const imagenes = await firstValueFrom(this._articuloService.getUrlImages(this.articulos[index].CODIGO)
+        .pipe(takeUntil(this.cancelador$)));
       if (imagenes && imagenes.length > 0) {
         return imagenes[0];
       } else {
@@ -148,11 +157,14 @@ export class HomeComponent implements OnInit {
     try {
       this.spinner = true;
       this.pausarCarrusel();
+      this.imagenes[this.indexImagen] = '';
       const cliente = localStorage.getItem('loginClientNumber');
       const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
-      this.reanudarCarrusel();
       this.articulos = articulos;
+      await this.actualizarDatos(0);
+      this.reanudarCarrusel();
+      setTimeout(() => this.initCarrusel());
     } catch (err) {
       console.error('Error cargando busqueda de articulos', err);
       throw err;
