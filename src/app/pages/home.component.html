@@ -1,5 +1,6 @@
 <div class="container">
   <h2>Bienvenido a CasaParts</h2>
+
   <!-- 🛒 Ícono de carrito fijo -->
   <div
     style="position: fixed; top: 10px; right: 10px; z-index: 1000; background-color: yellow; padding: 5px; border-radius: 8px; cursor: pointer;"
@@ -10,32 +11,66 @@
       {{ cartLength }}
     </span>
   </div>
+
   <!-- 🔍 Buscador -->
   <div class="buscador">
     <input [(ngModel)]="busqueda" placeholder="Buscar producto..." />
     <button type="button" (click)="buscar()">🔍</button>
   </div>
+
+  <!-- Estados -->
   <div *ngIf="cargandoProductos" class="text-muted mt-2">Buscando productos...</div>
   <div *ngIf="errorProductos" class="text-danger mt-2">{{ errorProductos }}</div>
   <div [hidden]="!spinner" class="spinner-border spinner-border-sm" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
-  <!-- 🏷️ Carrusel de Ofertas -->
+
+  <!-- 🏷️ Carrusel de resultados -->
   <ng-container>
-    <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
-      data-bs-interval="3000">
+    <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4"
+      data-bs-ride="carousel" data-bs-interval="3000">
       <div class="carousel-inner" style="width: 100%; height: auto;">
-        <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex" class="carousel-item text-center"
-          [class.active]="i === 0">
-          <img *ngIf="imagenes[i]=='' || imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
-            [alt]="" style="width: 100%; height: 100%;" />
-          <img *ngIf="imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto" [alt]=""
-            style="width: 100%; height: auto;" />
-          <p>
+
+        <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex"
+             class="carousel-item text-center"
+             [class.active]="i === 0">
+
+          <!-- Imagen -->
+          <img *ngIf="!imagenes[i]" src="assets/images/not_found.png"
+               class="d-block mx-auto"
+               [alt]="articulo?.DESCRIP || 'Imagen no disponible'"
+               style="width: 100%; height: 100%;" />
+          <img *ngIf="imagenes[i]" [src]="imagenes[i]"
+               class="d-block mx-auto"
+               [alt]="articulo?.DESCRIP || 'Imagen del producto'"
+               style="width: 100%; height: auto;" />
+
+          <!-- Título / descripción principal -->
+          <p class="mt-2 mb-1">
             <strong>{{ articulo.DESCRIP }}</strong>
           </p>
+
+          <!-- 🔹 Datos técnicos agregados -->
+           <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Marca:</span>
+              <span class="fw-semibold">{{ articulo.MARCA }}</span>
+            </div>
+          <div class="small text-start mx-auto" style="max-width: 560px;">
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Código:</span>
+              <span class="fw-semibold">{{ articulo.CODIGO }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">N° Pieza original:</span>
+              <span class="fw-semibold">{{ articulo.ORIGINAL }}</span>
+            </div>
+            
+          </div>
+          <!-- 🔹 Fin datos técnicos -->
+
         </div>
       </div>
+
       <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Anterior</span>
@@ -46,5 +81,7 @@
       </button>
     </div>
   </ng-container>
+
+  <!-- 📦 Botón para ir al resumen del carrito -->
   <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button>
 </div>

@@ -62,6 +62,7 @@ export class HomeComponent implements OnInit {
             const activeItem = el.querySelector('.carousel-item.active');
             const items = Array.from(el.querySelectorAll('.carousel-item'));
             const currentIndex = items.indexOf(activeItem as Element);
+            console.log('Índice actual:', currentIndex);
             if (this.articulos[currentIndex] && this.imagenes[currentIndex] == '') {
               const resp = await this.obtenerImagen(currentIndex);
               this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
@@ -139,7 +140,8 @@ export class HomeComponent implements OnInit {
         .toPromise();
       if (imagenes && imagenes.length > 0) {
         return imagenes[0];
-      } else {
+      }
+      else {
         return null;
       }
 
