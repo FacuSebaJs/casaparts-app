@@ -24,7 +24,7 @@ export class ArticuloService {
     }
 
     getUrlImages(codigo: string) {
-        let url: string = `${environment.URL_IMAGES}/getFormatImgArticulo/${codigo}`;
+        let url: string = `${environment.IMAGES_URL}/getFormatImgArticulo/${codigo}`;
         return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
             map(images => {
                 return images;

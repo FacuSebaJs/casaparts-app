@@ -1,6 +1,8 @@
 export const environment = {
-    production: true,
+    production: false,
     API_URL: 'https://casaparts.casadelrenault.com/backend',
     AUTH_URL: 'https://casaparts.casadelrenault.com/auth',
-    URL_IMAGES: 'https://listas.casadelrenault.com/orders',
+    IMAGES_URL: 'https://listas.casadelrenault.com/orders',
+    SOCKET_URL: 'https://casaparts.casadelrenault.com',
+    SOCKET_PATH: '/socket.io'
 }

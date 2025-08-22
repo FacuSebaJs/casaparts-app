@@ -20,6 +20,8 @@ export class LoginComponent {
       next: (response: any) => {
         if (response.acceso_permitido == true) {
           localStorage.setItem('loginClientNumber', this.cliente?.toString() || '');
+          localStorage.setItem('token', response.token ? response.token : 'development');
+          localStorage.setItem('user', this.cliente?.toString() || '');
           this.router.navigate(['/home']);
         }
         else {
