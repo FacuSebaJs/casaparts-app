@@ -84,10 +84,18 @@
                 <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].venta }}</span>
               </div>
             </div>
+            <div class="mt-3 d-flex justify-content-center gap-2">
+              <button class="btn btn-primary" type="button" (click)="agregarAlCarrito(articulo)">
+                Agregar al carrito
+              </button>
+              <button class="btn btn-dark" type="button" (click)="irAlCarrito()">
+                Ver pedido
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </ng-container>
   </div>
-  <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button>
+  <!-- <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button> -->
 </div>
