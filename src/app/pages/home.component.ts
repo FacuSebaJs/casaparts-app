@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +14,7 @@ declare var bootstrap: any;
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('carouselOfertas', { static: false }) carouselElement!: ElementRef;
   carouselInstance: any;
   cargandoProductos = false;
@@ -52,8 +52,7 @@ export class HomeComponent implements OnInit {
   initCarrusel() {
     if (this.carouselInstance) {
       this.carouselInstance.dispose();
-    }
-    else {
+    } else {
       setTimeout(() => {
         const el = this.carouselElement?.nativeElement;
         if (el) {
@@ -71,7 +70,7 @@ export class HomeComponent implements OnInit {
         } else {
           setTimeout(() => {
             this.initCarrusel();
-          }, 1000)
+          }, 1000);
           console.error('Carrusel no disponible en el DOM');
         }
       });
@@ -84,7 +83,7 @@ export class HomeComponent implements OnInit {
 
   async cargarnovedades() {
     try {
-      let cliente = localStorage.getItem('loginClientNumber')
+      let cliente = localStorage.getItem('loginClientNumber');
       const articulos = await firstValueFrom(this.api.getNov(cliente));
       await this.obtenerImagenes(articulos);
       this.articulos = articulos;
@@ -95,9 +94,26 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
+  // === NUEVO: agregar al carrito con mapeo seguro ===
   agregarAlCarrito(p: any): void {
-    this.cartService.add(p);
+    const item = this.mapProductoAItem(p);
+    this.cartService.add(item);
+  }
+
+  private mapProductoAItem(p: any) {
+    // Intentamos cubrir tus posibles campos (DESCRIP, CODIGO, MARCA, PRECIO, etc.)
+    const precioPosibles = [
+      p.PRECIO, p.precio, p.PRECIO_LISTA, p.PRECIOFINAL, p.price
+    ].map((x: any) => Number(x)).find((n: number) => !isNaN(n));
+    return {
+      id: p.id ?? p.CODIGO ?? p.codigo ?? p.sku ?? p.DESCRIP ?? p.nombre,
+      nombre: p.DESCRIP ?? p.nombre ?? p.titulo ?? 'Producto',
+      precio: precioPosibles ?? 0,
+      imagen: p.imagen ?? p.imageUrl ?? p.foto ?? null,
+      marca: p.MARCA ?? p.marca ?? p.brand ?? null,
+      codigo: p.CODIGO ?? p.codigo ?? p.sku ?? null,
+      cantidad: 1
+    };
   }
 
   irAlCarrito(): void {
@@ -133,18 +149,15 @@ export class HomeComponent implements OnInit {
   }
 
   async obtenerImagen(index: number) {
-
     try {
       const imagenes = await this.api.getUrlImages(this.articulos[index].CODIGO)
         .pipe(takeUntil(this.cancelador$))
         .toPromise();
       if (imagenes && imagenes.length > 0) {
         return imagenes[0];
-      }
-      else {
+      } else {
         return null;
       }
-
     } catch (err) {
       if (err instanceof Error && err.name === 'CanceledError') {
         console.log('Petición cancelada');
@@ -154,6 +167,7 @@ export class HomeComponent implements OnInit {
       return null;
     }
   }
+
   pausarCarrusel() {
     if (this.carouselInstance) {
       this.carouselInstance.pause();
@@ -165,6 +179,4 @@ export class HomeComponent implements OnInit {
       this.carouselInstance.cycle();
     }
   }
-
 }
-
