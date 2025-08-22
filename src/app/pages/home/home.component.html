@@ -9,6 +9,13 @@
       {{ cartLength }}
     </span>
   </div>
+  <div
+    style="position: fixed; top: 10px; right: 60px; z-index: 1000; padding: 5px; border-radius: 8px; cursor: pointer;"
+    (click)="logout()">
+    <i style="font-size: xx-large; color: #6D6F71 !important;" class="material-icons">
+      logout
+    </i>
+  </div>
   <div class="buscador">
     <input [(ngModel)]="busqueda" placeholder="Buscar artículo..." (keyup.enter)="buscar()" />
     <button type="button" (click)="buscar()">🔍</button>
@@ -32,6 +39,31 @@
                 <p class="text-white mt-2">Cargando artículo...</p>
               </div>
               <div style="position: relative; width: 100%; height: 150px;">
+                <img *ngIf="articulo.QLISTA == 'N'" src="assets/images/novedad2.png" alt="NOVEDAD"
+                  style="position: absolute; top: 5px; left: 5px; width: 30px; height: 30px; z-index: 20;"
+                  [class.invisible]="spinner" />
+                <img *ngIf="articulo.QLISTA == 'O'" src="assets/images/oferta2.png" alt="OFERTA"
+                  style="position: absolute; top: 5px; left: 5px; width: 30px; height: 30px; z-index: 20;"
+                  [class.invisible]="spinner" />
+                <i *ngIf="articulo.estado === 'buying'; else elsePending" class="material-icons-outlined" title="PEDIDO"
+                  style="position: absolute; top: 5px; right: 5px; font-size: 30px; z-index: 20;"
+                  [class.invisible]="spinner">
+                  shopping_cart
+                </i>
+                <ng-template #elsePending>
+                  <i *ngIf="articulo.estado === 'pending'; else elseStock" class="material-icons" title="COMPRADO"
+                    style="position: absolute; top: 5px; right: 5px; font-size: 30px; z-index: 20;"
+                    [class.invisible]="spinner">
+                    shopping_cart
+                  </i>
+                </ng-template>
+                <ng-template #elseStock>
+                  <i *ngIf="articulo.QSTOCK == 'N' || articulo.QSTOCK == 'X'" class="material-icons" title="SIN STOCK"
+                    style="position: absolute; top: 5px; right: 5px; font-size: 30px; z-index: 20; color: red;"
+                    [class.invisible]="spinner">
+                    not_interested
+                  </i>
+                </ng-template>
                 <div *ngIf="imagenes[i]==''" style="width: 100%; height: 100%;"></div>
                 <img *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto" alt="Sin foto"
                   style="width: 100%; height: 100%;" />

@@ -5,12 +5,13 @@ import { HomeComponent } from './home.component';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 import { HomeRoutingModule } from './home-routing.module';
+import { OrderService } from '../../core/services/api/order.service';
 
 
 @NgModule({
     declarations: [HomeComponent],
     imports: [CommonModule, FormsModule, HomeRoutingModule],
-    providers: [ArticuloService, ConfigClienteService],
+    providers: [ArticuloService, ConfigClienteService, OrderService],
     exports: []
 })
 export class HomeModule { }

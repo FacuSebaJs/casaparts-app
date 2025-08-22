@@ -5,6 +5,8 @@ import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 import { SocketService } from '../../core/services/socket.service';
+import { OrderService } from '../../core/services/api/order.service';
+import { SessionService } from '../../core/services/session.service';
 declare var bootstrap: any;
 
 @Component({
@@ -22,7 +24,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   busqueda: string = '';
   imagenes: string[] = [];
   spinner: boolean = false;
-  configCliente: { general: number, contado: number, tarjeta: number, descuento: number } = { general: 0, contado: 0, tarjeta: 0, descuento: 0 };
+  configCliente: { general: number | null, contado: number | null, tarjeta: number | null, descuento: number | null } = { general: null, contado: null, tarjeta: null, descuento: null };
   precios: { costo: number | null, venta: number | null, contado: number | null, tarjeta: number | null }[] = [];
   indexImagen: number = 0;
   private cancelador$ = new Subject<void>();
@@ -41,7 +43,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     public cartService: CartService,
     private _articuloService: ArticuloService,
     private _configClienteService: ConfigClienteService,
-    private _socketService: SocketService
+    private _socketService: SocketService,
+    private _OrderService: OrderService,
+    private _sessionService : SessionService
   ) { }
 
   get cartLength(): number {
@@ -112,7 +116,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();
-    await this.actualizarDatos(0);
     this.spinner = false;
     this.reanudarCarrusel();
     this.initSocket();
@@ -184,17 +187,28 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async buscar() {
+    this.pausarCarrusel();
+    if (this.busqueda == '') {
+      await this.cargarnovedades();
+    }
+    else {
+      await this.filtrar();
+    }
+    this.reanudarCarrusel();
+    setTimeout(() => this.initCarrusel());
+  }
+
+  async filtrar() {
     try {
       this.spinner = true;
-      this.pausarCarrusel();
+
       this.imagenes[this.indexImagen] = '';
       const cliente = localStorage.getItem('loginClientNumber');
       const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
       this.articulos = articulos;
+      await this.refreshIcon();
       await this.actualizarDatos(0);
-      this.reanudarCarrusel();
-      setTimeout(() => this.initCarrusel());
     } catch (err) {
       console.error('Error cargando busqueda de articulos', err);
       throw err;
@@ -210,7 +224,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       const articulos = await firstValueFrom(this._articuloService.getNov(cliente));
       await this.cargarDatosVacios(articulos);
       this.articulos = articulos;
-      return articulos;
+      await this.refreshIcon();
+      await this.actualizarDatos(0);
     } catch (err) {
       console.error('Error cargando novedades', err);
       throw err;
@@ -233,10 +248,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       let cliente = localStorage.getItem('loginClientNumber')
       const coeficientes = await firstValueFrom(this._articuloService.getCoefArt(Number(cliente), articulo.CODIGO));
       let precio = { costo: 0, venta: 0, contado: 0, tarjeta: 0 };
-      precio.costo = this.twoDecimal(this.twoDecimal(articulo.PRECIO) - this.twoDecimal(articulo.PRECIO * this.configCliente.descuento / 100));
+      precio.costo = this.twoDecimal(this.twoDecimal(articulo.PRECIO) - this.twoDecimal(articulo.PRECIO * Number(this.configCliente.descuento) / 100));
       precio.venta = this.twoDecimal(this.twoDecimal(precio.costo) + this.twoDecimal((precio.costo * (coeficientes && coeficientes.Coef ? coeficientes.Coef : this.configCliente.general) / 100).toFixed(2)));
-      precio.contado = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * this.configCliente.contado / 100));
-      precio.tarjeta = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * this.configCliente.tarjeta / 100));
+      precio.contado = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * Number(this.configCliente.contado) / 100));
+      precio.tarjeta = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * Number(this.configCliente.tarjeta) / 100));
       if (articulo.DTO) {
         precio.costo = this.twoDecimal(this.twoDecimal(precio.costo) - this.twoDecimal(precio.costo * articulo.DTO / 100));
         precio.venta = this.twoDecimal(this.twoDecimal(precio.venta) - this.twoDecimal(precio.venta * articulo.DTO / 100));
@@ -345,7 +360,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     //   });
   }
 
-  public removeSockets() {
+  removeSockets() {
     if (this.obsSocConnect) {
       this.obsSocConnect.unsubscribe();
     }
@@ -359,6 +374,40 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       this.obsChangedOrderDetail.unsubscribe();
     }
     this._socketService.disconnect();
+  }
+
+  async refreshIcon() {
+    const cliente = localStorage.getItem('loginClientNumber');
+    const articulos = await firstValueFrom(this._OrderService.getBuyIcon(cliente));
+    if (this.articulos) {
+      let data = JSON.stringify(this.articulos);
+      if (data) {
+        data = data.replace(/"historial":/g, '"estado": null, "historial":');
+      }
+      let arts = JSON.parse(data);
+      if (articulos && articulos && this.articulos) {
+        for (let i of articulos.preOrder) {
+          for (let j = 0; j < this.articulos.length; j++) {
+            if (i.id_articulo == this.articulos[j].CODIGO) {
+              arts[j].estado = 'buying';
+            }
+          }
+        }
+        for (let k of articulos.order) {
+          for (let l = 0; l < this.articulos.length; l++) {
+            if (k.id_articulo == this.articulos[l].CODIGO && this.articulos[l].fecha_recibido == null) {
+              arts[l].estado = 'pending';
+            }
+          }
+        }
+      }
+      this.articulos = arts;
+    }
+  }
+
+  logout(): void {
+    this._sessionService.removeToken();
+    window.location.reload();
   }
 
 }

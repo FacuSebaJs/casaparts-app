@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ArticuloService {
     constructor(private http: HttpClient) { }
 
