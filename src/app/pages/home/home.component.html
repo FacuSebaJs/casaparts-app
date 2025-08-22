@@ -16,79 +16,80 @@
   <div *ngIf="cargandoProductos" class="text-muted mt-2">Buscando productos...</div>
   <div *ngIf="errorProductos" class="text-danger mt-2">{{ errorProductos }}</div>
   <div style="position: relative;">
-    <!-- Spinner Overlay -->
-    <div *ngIf="spinner" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-           background-color: rgba(128, 128, 128, 0.6); z-index: 10;
-           display: flex; align-items: center; justify-content: center; flex-direction: column;">
-      <div class="spinner-border text-light" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <p class="text-white mt-2">Cargando artículo...</p>
-    </div>
-
     <ng-container>
       <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
         data-bs-interval="5000">
         <div class="carousel-inner" style="width: 100%; height: auto;">
           <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex"
-            class="carousel-item text-center" [class.active]="i === 0">
+            class="carousel-item text-center" [class.active]="i === 0" style="position: relative;">
             <div style="position: relative;">
-              <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas" data-bs-slide="prev"
-                [class.invisible]="spinner">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas" data-bs-slide="next"
-                [class.invisible]="spinner">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Siguiente</span>
-              </button>
-              <div *ngIf="imagenes[i]==''" style="width: 100%; height: 150px;"></div>
-              <img *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto" alt="Sin foto"
-                style="width: 100%; height: 150px;" />
-              <img *ngIf="imagenes[i]!=null && imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto" alt=""
-                style="width: 100%; height: 150px;" />
-            </div>
-            <div class="small text-start mx-auto" style="max-width: 560px;">
-              <div class="d-flex justify-content-between mb-2" style="text-align: right; white-space: nowrap;">
-                <span class="text-muted" [class.invisible]="spinner">Descripción:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.DESCRIP }}</span>
+              <div *ngIf="spinner" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                       background-color: rgba(128, 128, 128, 0.6); z-index: 10;
+                       display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                <div class="spinner-border text-light" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-white mt-2">Cargando artículo...</p>
               </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">Marca:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.MARCA }}</span>
+              <div style="position: relative; width: 100%; height: 150px;">
+                <div *ngIf="imagenes[i]==''" style="width: 100%; height: 100%;"></div>
+                <img *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto" alt="Sin foto"
+                  style="width: 100%; height: 100%;" />
+                <img *ngIf="imagenes[i]!=null && imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto" alt=""
+                  style="width: 100%; height: 100%;" />
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselOfertas"
+                  data-bs-slide="prev" [class.invisible]="spinner"
+                  style="position: absolute; top: 50%; left: 0; transform: translateY(-50%);">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselOfertas"
+                  data-bs-slide="next" [class.invisible]="spinner"
+                  style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Siguiente</span>
+                </button>
               </div>
-              <div class="d-flex justify-content-between mb-2">
-                <!-- <span class="text-muted">Código:</span> -->
-                <span class="text-muted" [class.invisible]="spinner">Código:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.CODIGO }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">N° Original:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.ORIGINAL }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">COSTO:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].costo }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">CONTADO:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].contado }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">TARJETA:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].tarjeta }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted" [class.invisible]="spinner">VENTA:</span>
-                <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].venta }}</span>
+              <div class="small text-start mx-auto" style="max-width: 560px;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">Descripción:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.DESCRIP }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">Marca:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.MARCA }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">Código:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.CODIGO }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">N° Original:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.ORIGINAL }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">COSTO:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].costo }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">CONTADO:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].contado }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">TARJETA:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].tarjeta }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted" [class.invisible]="spinner">VENTA:</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].venta }}</span>
+                </div>
               </div>
             </div>
             <div class="mt-3 d-flex justify-content-center gap-2">
-              <button class="btn btn-primary" type="button" (click)="agregarAlCarrito(articulo)">
+              <button class="btn btn-primary" type="button" (click)="agregarAlCarrito(articulo)" [disabled]="spinner">
                 Agregar al carrito
               </button>
-              <button class="btn btn-dark" type="button" (click)="irAlCarrito()">
+              <button class="btn btn-dark" type="button" (click)="irAlCarrito()" [disabled]="spinner">
                 Ver pedido
               </button>
             </div>
@@ -97,5 +98,4 @@
       </div>
     </ng-container>
   </div>
-  <!-- <button class="btn btn-dark w-100 mt-4" type="button" (click)="irAlCarrito()">Ver pedido</button> -->
 </div>

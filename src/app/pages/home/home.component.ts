@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
 import { CartService } from '../../core/services/api/cart.service';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
+import { SocketService } from '../../core/services/socket.service';
 declare var bootstrap: any;
 
 @Component({
@@ -26,12 +27,21 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   indexImagen: number = 0;
   private cancelador$ = new Subject<void>();
   private slideListener: any;
+  private readonly unsubscribe$: Subject<void> = new Subject<void>();
+  private obsSocConnect: Subscription = new Subscription();
+  private obsSocRoom: Subscription = new Subscription();
+  // private obsSocStatus: Subscription = new Subscription();
+  // private observer: Subscription = new Subscription();
+  private obsChangedOrder: Subscription = new Subscription();
+  private obsChangedOrderDetail: Subscription = new Subscription();
+  // private obsSendProduct: Subscription = new Subscription();
 
   constructor(
     private router: Router,
     public cartService: CartService,
     private _articuloService: ArticuloService,
-    private _configClienteService: ConfigClienteService
+    private _configClienteService: ConfigClienteService,
+    private _socketService: SocketService
   ) { }
 
   get cartLength(): number {
@@ -76,6 +86,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   removeListener() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
     const el = this.carouselElement?.nativeElement;
     if (el && this.slideListener) {
       el.removeEventListener('slid.bs.carousel', this.slideListener);
@@ -103,6 +115,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     await this.actualizarDatos(0);
     this.spinner = false;
     this.reanudarCarrusel();
+    this.initSocket();
   }
 
   agregarAlCarrito(p: any): void {
@@ -239,6 +252,113 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private twoDecimal(value: any) {
     return Number(Number(value).toFixed(2));
+  }
+
+  private initSocket(): void {
+    this._socketService.connect();
+    if (this.obsSocConnect) {
+      this.obsSocConnect.unsubscribe();
+    }
+    this.obsSocConnect = this._socketService.connected()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((message) => {
+        console.info('%c' + message, 'color:Lightgreen');
+        this._socketService.connectRoom();
+      });
+    if (this.obsSocRoom) {
+      this.obsSocRoom.unsubscribe();
+    }
+    this.obsSocRoom = this._socketService.connectedRoom()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((message) => {
+        console.info('%c' + message, 'color:Lightgreen');
+      });
+    // if (this.obsChangedOrder) {
+    //   this.obsChangedOrder.unsubscribe();
+    // }
+    // this.obsChangedOrder = this._socketService.changedOrder()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe(async (data) => {
+    //     const action: string = data.isNew ? 'generado' : ' actualizado';
+    //     let order: number = 1;
+    //     if (data.order) {
+    //       order = data.order;
+    //     }
+    //     else if (response && response.order.length) {
+    //       order = response.order[0].order + 1;
+    //     }
+    //     const message: string = `Se ha ${action} el pedido N° ${order}`;
+    //     console.log(message);
+    //   })
+    // if (this.obsChangedOrderDetail) {
+    //   this.obsChangedOrderDetail.unsubscribe();
+    // }
+    // this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe(async (data) => {
+    //     const action: string = data == 'agregar' ? 'agregado' : 'modificado';
+    //     let message: string = `Se ha ${action} artículo/s en su compra`;
+    //     if (data == 'quitar') {
+    //       message = `Quitando artículos`;
+    //     }
+    //     if (data == 'iniciar') {
+    //       message = `Se ha iniciado una nueva compra`;
+    //     }
+    //     if (data != 'quitar') {
+    //       console.log(message, 'Información');
+    //     }
+    //     return null;
+    //   })
+    // if (this.obsSendProduct) {
+    //   this.obsSendProduct.unsubscribe();
+    // }
+    // this.obsSendProduct = this._socketService.sendProduct()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe(async (data) => {
+    //     const token: string | null = localStorage.getItem('token');
+    //     if (token == data.id) {
+    //       this.busqueda = data.product;
+    //       // this.getProductRef(data.product);
+    //     }
+    //   })
+    // if (this.observer) {
+    //   this.observer.unsubscribe();
+    // }
+    // this._socketService.changedLocation()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe((value) => {
+    //     let index = this.articulos.findIndex(o => o.CODIGO == value.articulo.CODIGO)
+    //     this.articulos[index].ubicacion.length == 0 ? this.articulos[index].ubicacion.push(value.articulo) : this.articulos[index].ubicacion[0].UBICACION = value.articulo.UBICACION
+    //     this.ubicacionArticuloSeleccionado = this.selectedArt.ubicacion?.length > 0 ? this.selectedArt.ubicacion[0].UBICACION : null;
+    //   });
+    // this._socketService.changeBanner()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe(() => {
+    //     console.log("Se han actualizado las publicidades");
+    //     // let frame: HTMLIFrameElement = <HTMLIFrameElement>document.getElementById('idFrame')
+    //     // frame.src += '';
+    //   });
+    // this._socketService.changedData()
+    //   .pipe(takeUntil(this.unsubscribe$))
+    //   .subscribe(() => {
+    //     // this.dateScript = new Date();
+    //   });
+  }
+
+  public removeSockets() {
+    if (this.obsSocConnect) {
+      this.obsSocConnect.unsubscribe();
+    }
+    if (this.obsSocRoom) {
+      this.obsSocRoom.unsubscribe();
+    }
+    if (this.obsChangedOrder) {
+      this.obsChangedOrder.unsubscribe();
+    }
+    if (this.obsChangedOrderDetail) {
+      this.obsChangedOrderDetail.unsubscribe();
+    }
+    this._socketService.disconnect();
   }
 
 }

@@ -22,6 +22,7 @@
     "@angular/service-worker": "^19.2.14",
     "bootstrap": "^5.3.7",
     "ngx-socket-io": "^4.9.3",
+    "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "swiper": "^11.2.10",
     "tslib": "^2.3.0",
