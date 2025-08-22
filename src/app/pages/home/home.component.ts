@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartService } from '../order/cart.service';
+import { CartService } from '../../core/services/api/cart.service';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
@@ -106,11 +106,28 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   agregarAlCarrito(p: any): void {
-    this.cartService.add(p);
+    const item = this.mapProductoAItem(p);
+    this.cartService.add(item);
+  }
+
+  private mapProductoAItem(p: any) {
+    // Intentamos cubrir tus posibles campos (DESCRIP, CODIGO, MARCA, PRECIO, etc.)
+    const precioPosibles = [
+      p.PRECIO, p.precio, p.PRECIO_LISTA, p.PRECIOFINAL, p.price
+    ].map((x: any) => Number(x)).find((n: number) => !isNaN(n));
+    return {
+      id: p.id ?? p.CODIGO ?? p.codigo ?? p.sku ?? p.DESCRIP ?? p.nombre,
+      nombre: p.DESCRIP ?? p.nombre ?? p.titulo ?? 'Producto',
+      precio: precioPosibles ?? 0,
+      imagen: p.imagen ?? p.imageUrl ?? p.foto ?? null,
+      marca: p.MARCA ?? p.marca ?? p.brand ?? null,
+      codigo: p.CODIGO ?? p.codigo ?? p.sku ?? null,
+      cantidad: 1
+    };
   }
 
   irAlCarrito(): void {
-    this.router.navigate(['/cart']);
+    this.router.navigate(['/order']);
   }
 
   trackByIndex = (i: number) => i;
