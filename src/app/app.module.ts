@@ -13,8 +13,9 @@ import { AppComponent } from './app.component';
 import { SocketService } from './core/services/socket.service';
 import localeEs from '@angular/common/locales/es-AR';
 registerLocaleData(localeEs, 'es-AR');
+import { GlobalConfig, ToastrModule } from 'ngx-toastr';
 
-const config: SocketIoConfig = {
+const socketConfig: SocketIoConfig = {
     url: environment.SOCKET_URL, options: {
         autoConnect: false,
         path: environment.SOCKET_PATH,
@@ -30,6 +31,16 @@ const config: SocketIoConfig = {
     }
 };
 
+const toastConfig: Partial<GlobalConfig> = {
+    timeOut: 5000,
+    positionClass: 'toast-bottom-full-width-custom',
+    preventDuplicates: true,
+    closeButton: false,
+    maxOpened: 1,
+    autoDismiss: true,
+    tapToDismiss: false
+}
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -42,13 +53,15 @@ const config: SocketIoConfig = {
         CoreModule,
         FormsModule,
         ReactiveFormsModule,
-        SocketIoModule.forRoot(config),
+        SocketIoModule.forRoot(socketConfig),
+        ToastrModule.forRoot(toastConfig)
     ],
     providers: [
         { provide: LOCALE_ID, useValue: 'es-AR' },
         provideHttpClient(withInterceptorsFromDi()),
         SocketService
     ],
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
+    exports: [ToastrModule]
 })
 export class AppModule { }

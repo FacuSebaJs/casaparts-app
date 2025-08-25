@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,7 @@ export class LoginComponent {
   clave: string = '';
   Email: string = '';
 
-  constructor(private router: Router, private _authService: AuthService) { }
+  constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService) { }
 
   ingresar() {
     this._authService.login(this.cliente, this.Email, this.clave).subscribe({
@@ -26,15 +27,15 @@ export class LoginComponent {
         }
         else {
           if (response.error_code == 6) {
-            console.log('Esta cuenta no se encuentra autorizada')
+            this._toastrService.error('Esta cuenta no se encuentra autorizada', 'Error');
           }
           else {
-            console.log('Usuario incorrecto');
+            this._toastrService.warning('Usuario incorrecto', 'Atención');
           }
         }
       },
-      error: err => {
-        console.error('Error al ingresar', err);
+      error: () => {
+        this._toastrService.error('Error al validar el usuario', 'Error');
       }
     });
 

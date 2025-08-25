@@ -7,7 +7,9 @@ import { ConfigClienteService } from '../../core/services/api/config_cliente.ser
 import { SocketService } from '../../core/services/socket.service';
 import { OrderService } from '../../core/services/api/order.service';
 import { SessionService } from '../../core/services/session.service';
-declare var bootstrap: any;
+import { ToastrService } from 'ngx-toastr';
+import { Carousel, Dropdown } from 'bootstrap';
+
 
 @Component({
   selector: 'app-home',
@@ -32,11 +34,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly unsubscribe$: Subject<void> = new Subject<void>();
   private obsSocConnect: Subscription = new Subscription();
   private obsSocRoom: Subscription = new Subscription();
-  // private obsSocStatus: Subscription = new Subscription();
-  // private observer: Subscription = new Subscription();
   private obsChangedOrder: Subscription = new Subscription();
   private obsChangedOrderDetail: Subscription = new Subscription();
-  // private obsSendProduct: Subscription = new Subscription();
+  cliente: string | null = null;
 
   constructor(
     private router: Router,
@@ -44,8 +44,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private _articuloService: ArticuloService,
     private _configClienteService: ConfigClienteService,
     private _socketService: SocketService,
-    private _OrderService: OrderService,
-    private _sessionService : SessionService
+    private _orderService: OrderService,
+    private _sessionService: SessionService,
+    private _toastrService: ToastrService
   ) { }
 
   get cartLength(): number {
@@ -72,7 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       const el = this.carouselElement?.nativeElement;
       if (el) {
-        this.carouselInstance = new bootstrap.Carousel(el);
+        this.carouselInstance = new Carousel(el);
         this.slideListener = async () => {
           this.pausarCarrusel();
           const activeItem = el.querySelector('.carousel-item.active');
@@ -113,6 +114,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async cargaInicial() {
+    this.cliente = this._sessionService.getUser();
     this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();
@@ -203,8 +205,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       this.spinner = true;
 
       this.imagenes[this.indexImagen] = '';
-      const cliente = localStorage.getItem('loginClientNumber');
-      const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(cliente), this.busqueda));
+      const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(this.cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
       this.articulos = articulos;
       await this.refreshIcon();
@@ -220,8 +221,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async cargarnovedades() {
     try {
-      let cliente = localStorage.getItem('loginClientNumber')
-      const articulos = await firstValueFrom(this._articuloService.getNov(cliente));
+      const articulos = await firstValueFrom(this._articuloService.getNov(Number(this.cliente)));
       await this.cargarDatosVacios(articulos);
       this.articulos = articulos;
       await this.refreshIcon();
@@ -234,8 +234,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async cargarConfigCliente() {
     try {
-      let cliente = localStorage.getItem('loginClientNumber')
-      const configCliente = await firstValueFrom(this._configClienteService.getConfig(cliente));
+      const configCliente = await firstValueFrom(this._configClienteService.getConfig(Number(this.cliente)));
       this.configCliente = configCliente;
     } catch (err) {
       console.error('Error cargando configuración de cliente', err);
@@ -245,8 +244,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async calcularPrecio(articulo: any) {
     try {
-      let cliente = localStorage.getItem('loginClientNumber')
-      const coeficientes = await firstValueFrom(this._articuloService.getCoefArt(Number(cliente), articulo.CODIGO));
+      const coeficientes = await firstValueFrom(this._articuloService.getCoefArt(Number(this.cliente), articulo.CODIGO));
       let precio = { costo: 0, venta: 0, contado: 0, tarjeta: 0 };
       precio.costo = this.twoDecimal(this.twoDecimal(articulo.PRECIO) - this.twoDecimal(articulo.PRECIO * Number(this.configCliente.descuento) / 100));
       precio.venta = this.twoDecimal(this.twoDecimal(precio.costo) + this.twoDecimal((precio.costo * (coeficientes && coeficientes.Coef ? coeficientes.Coef : this.configCliente.general) / 100).toFixed(2)));
@@ -288,76 +286,45 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((message) => {
         console.info('%c' + message, 'color:Lightgreen');
       });
-    // if (this.obsChangedOrder) {
-    //   this.obsChangedOrder.unsubscribe();
-    // }
-    // this.obsChangedOrder = this._socketService.changedOrder()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe(async (data) => {
-    //     const action: string = data.isNew ? 'generado' : ' actualizado';
-    //     let order: number = 1;
-    //     if (data.order) {
-    //       order = data.order;
-    //     }
-    //     else if (response && response.order.length) {
-    //       order = response.order[0].order + 1;
-    //     }
-    //     const message: string = `Se ha ${action} el pedido N° ${order}`;
-    //     console.log(message);
-    //   })
-    // if (this.obsChangedOrderDetail) {
-    //   this.obsChangedOrderDetail.unsubscribe();
-    // }
-    // this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe(async (data) => {
-    //     const action: string = data == 'agregar' ? 'agregado' : 'modificado';
-    //     let message: string = `Se ha ${action} artículo/s en su compra`;
-    //     if (data == 'quitar') {
-    //       message = `Quitando artículos`;
-    //     }
-    //     if (data == 'iniciar') {
-    //       message = `Se ha iniciado una nueva compra`;
-    //     }
-    //     if (data != 'quitar') {
-    //       console.log(message, 'Información');
-    //     }
-    //     return null;
-    //   })
-    // if (this.obsSendProduct) {
-    //   this.obsSendProduct.unsubscribe();
-    // }
-    // this.obsSendProduct = this._socketService.sendProduct()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe(async (data) => {
-    //     const token: string | null = localStorage.getItem('token');
-    //     if (token == data.id) {
-    //       this.busqueda = data.product;
-    //       // this.getProductRef(data.product);
-    //     }
-    //   })
-    // if (this.observer) {
-    //   this.observer.unsubscribe();
-    // }
-    // this._socketService.changedLocation()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe((value) => {
-    //     let index = this.articulos.findIndex(o => o.CODIGO == value.articulo.CODIGO)
-    //     this.articulos[index].ubicacion.length == 0 ? this.articulos[index].ubicacion.push(value.articulo) : this.articulos[index].ubicacion[0].UBICACION = value.articulo.UBICACION
-    //     this.ubicacionArticuloSeleccionado = this.selectedArt.ubicacion?.length > 0 ? this.selectedArt.ubicacion[0].UBICACION : null;
-    //   });
-    // this._socketService.changeBanner()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe(() => {
-    //     console.log("Se han actualizado las publicidades");
-    //     // let frame: HTMLIFrameElement = <HTMLIFrameElement>document.getElementById('idFrame')
-    //     // frame.src += '';
-    //   });
-    // this._socketService.changedData()
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe(() => {
-    //     // this.dateScript = new Date();
-    //   });
+    if (this.obsChangedOrder) {
+      this.obsChangedOrder.unsubscribe();
+    }
+    this.obsChangedOrder = this._socketService.changedOrder()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(async (data) => {
+        const action: string = data.isNew ? 'generado' : ' actualizado';
+        let order: number = 1;
+        const response = await firstValueFrom(this._orderService.getBuyIcon(Number(this.cliente)));
+        if (data.order) {
+          order = data.order;
+        }
+        else if (response && response.order.length) {
+          order = response.order[0].order + 1;
+        }
+        const message: string = `Se ha ${action} el pedido N° ${order}`;
+        this._toastrService.info(message);
+      })
+    if (this.obsChangedOrderDetail) {
+      this.obsChangedOrderDetail.unsubscribe();
+    }
+    this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(async (data) => {
+        const action: string = data == 'agregar' ? 'agregado' : 'modificado';
+        let message: string = `Se ha ${action} artículo/s en su compra`;
+        if (data == 'quitar') {
+          message = `Quitando artículos`;
+        }
+        if (data == 'iniciar') {
+          message = `Se ha iniciado una nueva compra`;
+        }
+        if (data != 'quitar') {
+          this._toastrService.info(message, 'Información');
+          this.toggleMenu(true);
+        }
+        this.refreshIcon();
+        return null;
+      })
   }
 
   removeSockets() {
@@ -377,8 +344,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async refreshIcon() {
-    const cliente = localStorage.getItem('loginClientNumber');
-    const articulos = await firstValueFrom(this._OrderService.getBuyIcon(cliente));
+    const articulos = await firstValueFrom(this._orderService.getBuyIcon(this.cliente));
     if (this.articulos) {
       let data = JSON.stringify(this.articulos);
       if (data) {
@@ -410,5 +376,21 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     window.location.reload();
   }
 
-}
+  toggleMenu(forceShow = false) {
+    const dropdownButton = document.getElementById("dropdownMenuButton");
+    if (dropdownButton) {
+      const dropdownInstance = Dropdown.getOrCreateInstance(dropdownButton);
+      const menu = dropdownButton.nextElementSibling;
+      const isOpen = menu?.classList.contains('show');
+      if (forceShow) {
+        if (!isOpen) {
+          dropdownInstance.show();
+        }
+      }
+      else {
+        isOpen ? dropdownInstance.hide() : dropdownInstance.show();
+      }
+    }
+  }
 
+}
