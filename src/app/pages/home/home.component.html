@@ -1,20 +1,20 @@
-<div class="container">
+<div class="container" style="background-color: white;">
   <h2>Bienvenido a CasaParts</h2>
   <div class="dropdown"
     style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 5px; border-radius: 8px; cursor: pointer;">
-    <button class="btn btn-outline-secondary" type="button" id="dropdownMenuButton"
-       aria-expanded="false" (click)="toggleMenu()">
+    <button class="btn btn-outline-secondary" type="button" id="dropdownMenuButton" aria-expanded="false"
+      (click)="toggleMenu()">
       <i class="bi bi-list" style="font-size: 1.5rem;"></i>
     </button>
     <ul class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton" style="min-width: auto;">
       <li>
         <a class="dropdown-item p-1" (click)="irAlCarrito()">
           <div style="position: relative; display: inline-block;">
-            <img src="assets/images/CarritoCompras.png" alt="Carrito" width="36" height="36" />
-            <span *ngIf="cartLength > 0"
-              style="position: absolute; top: -6px; right: -6px; background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; line-height: 1;">
-              {{ cartLength }}
-            </span>
+            <img src="assets/images/CarritoCompras.png" alt="Carrito" width="36" height="36"
+              style="background-color: transparent;" />
+            <span *ngIf="articulosCarrito > 0"
+              style="position: absolute; top: -6px; right: -6px; background-color: red; color: white; border-radius: 999px; padding: 2px 6px; font-size: 12px; line-height: 1; min-width: 18px; text-align: center; display: inline-block; ">
+              {{ (articulosCarrito>99) ? '99+' : articulosCarrito}} </span>
           </div>
         </a>
       </li>
@@ -25,7 +25,7 @@
       </li>
     </ul>
   </div>
-  <div class="buscador">
+  <div class="buscador p-1">
     <input [(ngModel)]="busqueda" placeholder="Buscar artículo..." (keyup.enter)="buscar()" />
     <button type="button" (click)="buscar()">🔍</button>
   </div>
@@ -34,18 +34,25 @@
   <div style="position: relative;">
     <ng-container>
       <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
-        data-bs-interval="5000">
+        data-bs-interval="50000">
         <div class="carousel-inner" style="width: 100%; height: auto;">
           <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex"
             class="carousel-item text-center" [class.active]="i === 0" style="position: relative;">
             <div style="position: relative;">
-              <div *ngIf="spinner" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                       background-color: rgba(128, 128, 128, 0.6); z-index: 10;
-                       display: flex; align-items: center; justify-content: center; flex-direction: column;">
+              <!-- <div *ngIf="spinner"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(128, 128, 128, 0.6); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column;">
                 <div class="spinner-border text-light" role="status">
                   <span class="visually-hidden">Cargando...</span>
                 </div>
                 <p class="text-white mt-2">Cargando artículo...</p>
+              </div> -->
+              <div *ngIf="spinner"
+                style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px);  z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; ">
+                <!-- <img src="assets/images/novedad2.png" alt="Cargando..." style="width: 60px; height: 60px;" /> -->
+                <div class="spinner-border text-dark" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-black mt-2">Cargando artículo...</p>
               </div>
               <div style="position: relative; width: 100%; height: 150px;">
                 <img *ngIf="articulo.QLISTA == 'N'" src="assets/images/novedad2.png" alt="NOVEDAD"
@@ -94,7 +101,9 @@
               <div class="small text-start mx-auto" style="max-width: 560px;">
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">Descripción:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.DESCRIP }}</span>
+                  <div class="fw-semibold text-end text-break ms-2" [class.invisible]="spinner" style="flex: 1;">
+                    {{ articulo.DESCRIP }}
+                  </div>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">Marca:</span>
@@ -110,19 +119,20 @@
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">COSTO:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].costo }}</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].costo | number: '1.2-2' }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">CONTADO:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].contado }}</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].contado | number: '1.2-2'}}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">TARJETA:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].tarjeta }}</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].tarjeta | number: '1.2-2'
+                    }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">VENTA:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].venta }}</span>
+                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].venta | number: '1.2-2' }}</span>
                 </div>
               </div>
             </div>

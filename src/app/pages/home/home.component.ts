@@ -37,10 +37,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private obsChangedOrder: Subscription = new Subscription();
   private obsChangedOrderDetail: Subscription = new Subscription();
   cliente: string | null = null;
+  articulosCarrito: number = 0;
 
   constructor(
     private router: Router,
-    public cartService: CartService,
+    private _cartService: CartService,
     private _articuloService: ArticuloService,
     private _configClienteService: ConfigClienteService,
     private _socketService: SocketService,
@@ -50,7 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   ) { }
 
   get cartLength(): number {
-    return this.cartService.getCart()?.length ?? 0;
+    return this._cartService.getCart()?.length ?? 0;
   }
 
   ngOnInit(): void {
@@ -118,6 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();
+    await this.cargarCarrito();
     this.spinner = false;
     this.reanudarCarrusel();
     this.initSocket();
@@ -125,7 +127,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   agregarAlCarrito(p: any): void {
     const item = this.mapProductoAItem(p);
-    this.cartService.add(item);
+    this._cartService.add(item);
   }
 
   private mapProductoAItem(p: any) {
@@ -203,7 +205,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   async filtrar() {
     try {
       this.spinner = true;
-
       this.imagenes[this.indexImagen] = '';
       const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(this.cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
@@ -322,7 +323,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
           this._toastrService.info(message, 'Información');
           this.toggleMenu(true);
         }
-        this.refreshIcon();
+        await this.cargarCarrito();
+        await this.refreshIcon();
         return null;
       })
   }
@@ -390,6 +392,15 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       else {
         isOpen ? dropdownInstance.hide() : dropdownInstance.show();
       }
+    }
+  }
+
+  async cargarCarrito() {
+    try {
+      this.articulosCarrito = await firstValueFrom(this._orderService.getCountArticle(this.cliente));
+    }
+    catch (err) {
+      console.error('Error obteniendo cantidad del carrito', err);
     }
   }
 

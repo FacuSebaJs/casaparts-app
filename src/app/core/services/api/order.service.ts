@@ -1,7 +1,7 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
@@ -19,6 +19,40 @@ export class OrderService {
             }),
             catchError(err => {
                 console.error('Error al obtener íconos de compra', err);
+                return of();
+            })
+        );
+    }
+
+    getCountArticle(cliente: any): Observable<number> {
+        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1`;
+        return this.http.get<any[]>(url).pipe(
+            switchMap(orderHeader => {
+                if (orderHeader && orderHeader.length) {
+                    return this.getOne(orderHeader[0].id).pipe(
+                        map((order: any) => {
+                            return order.detalle.length;
+                        })
+                    );
+                } else {
+                    return of(0);
+                }
+            }),
+            catchError(err => {
+                console.error('Error al obtener cantidad de artículos', err);
+                return of(0);
+            })
+        );
+    }
+
+    private getOne(id: number): Observable<any> {
+        let url: string = `${environment.API_URL}/pedido/getOne/${id}`;
+        return this.http.get<any>(url, { responseType: 'json' }).pipe(
+            map((order: any) => {
+                return order;
+            }),
+            catchError(err => {
+                console.error(`Error al obtener el pedido ${id}`, err);
                 return of();
             })
         );
