@@ -10,27 +10,32 @@
     <!-- Lista de ítems -->
     <section class="items">
       <article class="item" *ngFor="let it of (carrito || []); trackBy: trackByIndex">
-        <img class="thumb" [src]="it?.imagen || placeholder" (error)="onImgError($event)"
-          [alt]="it?.nombre || 'Producto Casaparts'" />
+        <img
+          class="thumb"
+          [src]="it?.imagen || placeholder"
+          (error)="onImgError($event)"
+          [alt]="it?.nombre || 'Producto Casaparts'"
+        />
 
         <div class="meta">
           <h3 class="name">{{ it?.nombre || '—' }}</h3>
+
           <div class="brand" *ngIf="it?.marca || it?.codigo">
             <span *ngIf="it?.marca">{{ it?.marca }}</span>
             <span *ngIf="it?.codigo">• {{ it?.codigo }}</span>
           </div>
 
+          <!-- Cantidad solo lectura + eliminar -->
           <div class="qty">
-            <button class="btn-qty" (click)="dec(it)" aria-label="Restar">−</button>
-            <input type="number" min="1" [ngModel]="it?.cantidad ?? 1" (ngModelChange)="onQtyChange(it, $event)" />
-            <button class="btn-qty" (click)="inc(it)" aria-label="Sumar">+</button>
+            <span> Cant.: <strong>{{ it?.cantidad ?? 1 }}</strong> </span>
             <button class="btn-link danger" (click)="eliminar(it)">Eliminar</button>
           </div>
         </div>
 
         <div class="price">
-          <!-- unitario oculto en mobile; si querés mostrarlo, quita *ngIf="false" -->
-          <div class="unit" *ngIf="false">{{ (it?.precio ?? 0) | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+          <div class="unit" *ngIf="false">
+            {{ (it?.precio ?? 0) | currency:'ARS':'symbol-narrow':'1.0-0' }}
+          </div>
           <div class="sub">
             {{ ((it?.precio ?? 0) * (it?.cantidad ?? 1)) | currency:'ARS':'symbol-narrow':'1.0-0' }}
           </div>
@@ -56,6 +61,6 @@
   <!-- Footer fijo mobile -->
   <footer class="sticky-footer" *ngIf="(carrito?.length ?? 0) > 0">
     <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
-    <button class="btn-primary" [disabled]="!canProceed" (click)="irAConfirmar()">Confirmar pedido</button>
+    <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="irAConfirmar()">Confirmar pedido</button>
   </footer>
 </ng-template>

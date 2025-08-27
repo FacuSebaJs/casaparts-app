@@ -5,16 +5,16 @@
     <form (ngSubmit)="ingresar()">
       <div class="mb-3">
         <label>Nº de Cliente</label>
-        <input type="text" class="form-control" [(ngModel)]="cliente" name="cliente" placeholder="Ej: 12345" required />
+        <input type="text" class="form-control" [(ngModel)]="cliente" name="cliente" placeholder="Ingrese su numero de cliente" required />
       </div>
       <div class="mb-3">
         <label>Email</label>
-        <input type="email" class="form-control" [(ngModel)]="Email" name="email" placeholder="correo@ejemplo.com"
+        <input type="email" class="form-control" [(ngModel)]="Email" name="email" placeholder="ingrese su email"
           required />
       </div>
       <div class="mb-3">
-        <label>Código de Acceso</label>
-        <input type="password" class="form-control" [(ngModel)]="clave" name="clave" placeholder="••••••••" required />
+        <label>Password</label>
+        <input type="password" class="form-control" [(ngModel)]="clave" name="clave" placeholder="ingrese su password" required />
       </div>
       <button type="submit" class="btn btn-warning w-100 fw-bold">Ingresar</button>
     </form>
