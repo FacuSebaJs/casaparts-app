@@ -1,1 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
+@import '../node_modules/ngx-toastr/toastr.css'; /* Estilos de ngx-toastr */
+
+.toast-bottom-full-width-custom {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  pointer-events: none; /* permite clics solo en el toast */
+  z-index: 9999;  
+}
+
+.toast-bottom-full-width-custom .toast {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  pointer-events: auto;
+  box-shadow: none;
+}
