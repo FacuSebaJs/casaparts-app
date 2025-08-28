@@ -126,8 +126,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   agregarAlCarrito(p: any): void {
-    const item = this.mapProductoAItem(p);
-    this._cartService.add(item);
+    // const item = this.mapProductoAItem(p);
+    // this._cartService.add(item);
   }
 
   private mapProductoAItem(p: any) {
@@ -397,7 +397,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async cargarCarrito() {
     try {
-      this.articulosCarrito = await firstValueFrom(this._orderService.getCountArticle(this.cliente));
+      const buy = await firstValueFrom(this._orderService.getBuy(this.cliente));
+      this.articulosCarrito = buy.length;
     }
     catch (err) {
       console.error('Error obteniendo cantidad del carrito', err);

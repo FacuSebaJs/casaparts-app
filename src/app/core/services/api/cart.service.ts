@@ -2,14 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface CartItem {
-  id?: string | number;
-  nombre?: string;
-  precio?: number;
-  cantidad?: number;
-  imagen?: string;
-  marca?: string;
-  codigo?: string | number;
-  [k: string]: any; // flexible para ahora
+  CONTADO: number, COSTO: number, TARJETA: number, VENTA: number, articulo: { ART: number, AUTO: string, CODIGO: string, COSTO: string, DESCRIP: string, DESCRIP2: string, DESCRIP3: string, DTO: any, MARCA: string, N: number, ORIGINAL: string, PRECIO: string, QLISTA: string, QSTOCK: string, RUBRO: string, RUBRODTO: null }, cantidad: number, fecha_creacion: Date, fecha_recibido: Date | null, id: number, id_articulo: string, id_pedido: number
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,12 +40,12 @@ export class CartService {
 
   /** Agrega (o incrementa si ya existe) */
   add(item: CartItem): void {
-    const id = item.id ?? item.codigo ?? item.nombre;
-    const precio = Number(item.precio ?? 0);
+    const id = item.id ?? item.articulo.CODIGO ?? item.articulo.DESCRIP;
+    const precio = Number(item.articulo.PRECIO ?? 0);
     const cantidad = Math.max(1, Number(item.cantidad ?? 1));
 
     const idx = this.cartItems.findIndex(
-      x => (x.id ?? x.codigo ?? x.nombre) === id
+      x => (x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === id
     );
 
     if (idx > -1) {
@@ -60,7 +53,7 @@ export class CartService {
       const newQty = Math.max(1, Number(cur.cantidad ?? 1) + cantidad);
       this.cartItems[idx] = { ...cur, cantidad: newQty };
     } else {
-      this.cartItems.push({ ...item, id, precio, cantidad });
+      this.cartItems.push({ ...item, id, cantidad });
     }
 
     this.save();
@@ -71,7 +64,7 @@ export class CartService {
   actualizarCantidad(idOCodigo: string | number, qty: number) {
     const idStr = String(idOCodigo);
     const idx = this.cartItems.findIndex(
-      x => String(x.id ?? x.codigo ?? x.nombre) === idStr
+      x => String(x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === idStr
     );
     if (idx > -1) {
       this.cartItems[idx].cantidad = Math.max(1, Number(qty) || 1);
@@ -83,7 +76,7 @@ export class CartService {
   eliminarItem(idOCodigo: string | number) {
     const idStr = String(idOCodigo);
     this.cartItems = this.cartItems.filter(
-      x => String(x.id ?? x.codigo ?? x.nombre) !== idStr
+      x => String(x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) !== idStr
     );
     this.save();
   }

@@ -24,23 +24,23 @@ export class OrderService {
         );
     }
 
-    getCountArticle(cliente: any): Observable<number> {
+    getBuy(cliente: any): Observable<any[]> {
         const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1`;
         return this.http.get<any[]>(url).pipe(
             switchMap(orderHeader => {
                 if (orderHeader && orderHeader.length) {
                     return this.getOne(orderHeader[0].id).pipe(
                         map((order: any) => {
-                            return order.detalle.length;
+                            return order?.detalle || [];
                         })
                     );
                 } else {
-                    return of(0);
+                    return of([]);
                 }
             }),
             catchError(err => {
                 console.error('Error al obtener cantidad de artículos', err);
-                return of(0);
+                return of([]);
             })
         );
     }

@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CartService, CartItem } from '../../core/services/api/cart.service';
+import { OrderService } from '../../core/services/api/order.service';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { SessionService } from '../../core/services/session.service';
+import { ArticuloService } from '../../core/services/api/articulo.service';
 
 @Component({
   selector: 'app-cart',
-  standalone: false,  
+  standalone: false,
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
   carrito: CartItem[] = [];
+  imagenes: string[] = [];
+  placeholder = 'assets/images/Casaparts_logo2.png';
+  trackByIndex(i: number) { return i; }
+  private cancelador$ = new Subject<void>();
 
-  // placeholder del logo
- placeholder = 'assets/images/Casaparts_logo2.png';
-trackByIndex(i: number) { return i; }
 
-
-  constructor(private cartService: CartService, private router: Router) {}
+  constructor(private cartService: CartService, private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService) { }
 
   get subtotal(): number {
     return this.carrito.reduce((acc, it: any) => {
@@ -32,11 +36,18 @@ trackByIndex(i: number) { return i; }
   get canProceed(): boolean { return this.carrito.length > 0; }
 
   ngOnInit(): void {
-    const list = this.cartService.obtenerCarrito() || [];
+    this.cargaInicial();
+  }
+
+  async cargaInicial() {
+    // const list = this.cartService.obtenerCarrito() || [];
+    const cliente = this._sessionService.getUser();
+    const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
+    console.log("LIST:", list);
     this.carrito = (list as any[]).map(x => ({
       ...x,
-      precio: Number(x.precio) || 0,
-      cantidad: Number(x.cantidad ?? 1)
+      // precio: Number(x.precio) || 0,
+      // cantidad: Number(x.cantidad ?? 1)
     }));
   }
 
@@ -63,14 +74,14 @@ trackByIndex(i: number) { return i; }
   }
 
   eliminar(it: CartItem) {
-    const id = it.id ?? (it as any).codigo ?? it.nombre as any;
+    const id = it.id ?? (it as any).codigo ?? it.articulo.DESCRIP as any;
     const svc: any = this.cartService;
     if (typeof svc.eliminarItem === 'function') svc.eliminarItem(id);
     this.carrito = this.carrito.filter(x => x !== it);
   }
 
   private syncQty(it: CartItem) {
-    const id = it.id ?? (it as any).codigo ?? it.nombre as any;
+    const id = it.id ?? (it as any).codigo ?? it.articulo.DESCRIP as any;
     const svc: any = this.cartService;
     if (typeof svc.actualizarCantidad === 'function') svc.actualizarCantidad(id, it.cantidad);
   }
@@ -82,4 +93,32 @@ trackByIndex(i: number) { return i; }
   }
 
   volver() { this.router.navigate(['/']); }
+
+  async obtenerImagen(codigo: string) {
+    try {
+      const imagenes = await firstValueFrom(this._articuloService.getUrlImages(codigo)
+        .pipe(takeUntil(this.cancelador$)));
+      if (imagenes && imagenes.length > 0) {
+        return imagenes[0];
+      }
+      else {
+        return null;
+      }
+    } catch (err) {
+      console.error('Error cargando imagen', err);
+      return null;
+    }
+  }
+
+  async obtenerImagenes() {
+    try {
+      for (let i = 0; i < this.carrito.length; i++) {
+        const imagen = await this.obtenerImagen(this.carrito[i].articulo.CODIGO);
+        this.imagenes[i] = imagen;
+      }
+    } catch (err) {
+      console.error('Error cargando imágenes', err);
+    }
+  }
+
 }

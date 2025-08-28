@@ -66,9 +66,9 @@ export class CheckoutComponent implements OnInit {
     if (!this.canConfirm) return;
     const orden = {
       items: this.carrito.map(i => ({
-        id: i.id ?? (i as any).codigo ?? i.nombre,
-        nombre: i.nombre,
-        precio: i.precio,
+        id: i.id ?? (i as any).codigo ?? i.articulo.DESCRIP,
+        nombre: i.articulo.DESCRIP,
+        precio: i.articulo.PRECIO,
         cantidad: i.cantidad ?? 1
       })),
       entrega: this.deliveryMode,
