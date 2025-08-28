@@ -15,25 +15,16 @@ import { ArticuloService } from '../../core/services/api/articulo.service';
 export class CartComponent implements OnInit {
   carrito: CartItem[] = [];
   imagenes: string[] = [];
-  placeholder = 'assets/images/Casaparts_logo2.png';
-  trackByIndex(i: number) { return i; }
+  totales: number[] = [];
   private cancelador$ = new Subject<void>();
+  total: number = 0;
 
 
   constructor(private cartService: CartService, private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService) { }
 
-  get subtotal(): number {
-    return this.carrito.reduce((acc, it: any) => {
-      const price = Number(it.precio) || 0;
-      const qty = Number(it.cantidad ?? 1);
-      return acc + price * qty;
-    }, 0);
-  }
+  trackByIndex(i: number) { return i; }
 
-  // Por ahora, en Cart el total = subtotal (el envío y pago se definen en /checkout)
-  get total(): number { return this.subtotal; }
-
-  get canProceed(): boolean { return this.carrito.length > 0; }
+  get canProceed(): boolean { return (this.carrito?.length ?? 0) > 0; }
 
   ngOnInit(): void {
     this.cargaInicial();
@@ -49,30 +40,26 @@ export class CartComponent implements OnInit {
       // precio: Number(x.precio) || 0,
       // cantidad: Number(x.cantidad ?? 1)
     }));
+    this.cargarDatosVacios(this.carrito.length);
+    this.cargarTotales();
+    await this.obtenerImagenes();
   }
 
-  // Fallback de imagen
-  onImgError(ev: Event) {
-    (ev.target as HTMLImageElement).src = this.placeholder;
+  cargarTotales() {
+    this.total = 0;
+    for (let i = 0; i < this.carrito.length; i++) {
+      this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
+      this.total += this.totales[i];
+    }
+    console.log(this.totales);
+    console.log(this.total);
   }
 
-  // Cantidades / eliminar
-  inc(it: CartItem) {
-    it.cantidad = Math.min(Number(it.cantidad ?? 1) + 1, (it as any).stock ?? 999);
-    this.syncQty(it);
+  private twoDecimal(value: any) {
+    return Number(Number(value).toFixed(2));
   }
 
-  dec(it: CartItem) {
-    it.cantidad = Math.max(Number(it.cantidad ?? 1) - 1, 1);
-    this.syncQty(it);
-  }
-
-  onQtyChange(it: CartItem, v: string | number) {
-    const n = Math.max(1, Math.min(Number(v) || 1, (it as any).stock ?? 999));
-    it.cantidad = n;
-    this.syncQty(it);
-  }
-
+  // Eliminar ítem (se mantiene)
   eliminar(it: CartItem) {
     const id = it.id ?? (it as any).codigo ?? it.articulo.DESCRIP as any;
     const svc: any = this.cartService;
@@ -114,11 +101,17 @@ export class CartComponent implements OnInit {
     try {
       for (let i = 0; i < this.carrito.length; i++) {
         const imagen = await this.obtenerImagen(this.carrito[i].articulo.CODIGO);
-        this.imagenes[i] = imagen;
+        this.imagenes[i] = imagen?.formatos?.original ?? imagen;
       }
     } catch (err) {
       console.error('Error cargando imágenes', err);
     }
+  }
+
+  async cargarDatosVacios(length: number) {
+    this.imagenes = Array(length).fill("");
+    this.totales = Array(length).fill(0);
+    this.cancelador$.next();
   }
 
 }

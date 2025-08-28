@@ -6,27 +6,25 @@
 <ng-template #hasItems>
   <div class="checkout">
     <section class="items">
-      <article class="item" *ngFor="let it of carrito; trackBy: trackByIndex">
-        <!-- <img class="thumb" [src]="it?.imagen || placeholder" (error)="onImgError($event)"
-          [alt]="it.articulo.DESCRIP || 'Producto Casaparts'" /> -->
+      <article class="item" *ngFor="let it of carrito; let i = index; trackBy: trackByIndex">
+        <img class="thumb" *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
+          alt="Sin foto" style="width: 100%; height: 100%;" />
+        <img class="thumb" *ngIf="imagenes[i]!=null && imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto"
+          alt="" style="width: 100%; height: 100%; background-color: transparent;" />
         <div class="meta">
           <h3 class="name">{{ it.articulo.DESCRIP || '—' }}</h3>
-          <div class="brand" *ngIf="it.articulo.MARCA || it.articulo.CODIGO">
+          <div class="brand" *ngIf="it.articulo.MARCA && it.articulo.CODIGO">
             <span>{{ it.articulo.MARCA }}</span>
             <span>• {{ it.articulo.CODIGO }}</span>
           </div>
-
           <div class="qty">
-            <button class="btn-qty" (click)="dec(it)" aria-label="Restar">−</button>
-            <input type="number" min="1" [ngModel]="it?.cantidad ?? 1" (ngModelChange)="onQtyChange(it, $event)" />
-            <button class="btn-qty" (click)="inc(it)" aria-label="Sumar">+</button>
+            <span> Cant.: <strong>{{ it?.cantidad ?? 1 }}</strong> </span>
             <button class="btn-link danger" (click)="eliminar(it)">Eliminar</button>
           </div>
         </div>
         <div class="price">
-          <div class="unit" *ngIf="false">{{ (it?.articulo?.PRECIO ?? 0) | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
           <div class="sub">
-            <!-- {{ ((it.articulo.PRECIO ?? 0) * (Number(it.articulo.CANTIDAD) ?? 1)) | currency:'ARS':'symbol-narrow':'1.0-0' }} -->
+            {{ totales[i] | currency:'ARS':'symbol-narrow':'1.2-2' }}
           </div>
         </div>
       </article>
@@ -35,7 +33,7 @@
       <section class="card totals">
         <div class="row">
           <span>Total</span>
-          <span class="total">{{ total | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+          <span class="total">{{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
         </div>
         <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="irAConfirmar()">
           Confirmar pedido
@@ -45,7 +43,7 @@
     </aside>
   </div>
   <footer class="sticky-footer" *ngIf="(carrito?.length ?? 0) > 0">
-    <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
-    <button class="btn-primary" [disabled]="!canProceed" (click)="irAConfirmar()">Confirmar pedido</button>
+    <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
+    <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="irAConfirmar()">Confirmar pedido</button>
   </footer>
 </ng-template>

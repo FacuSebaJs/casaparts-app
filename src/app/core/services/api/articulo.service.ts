@@ -38,7 +38,7 @@ export class ArticuloService {
                 else {
                     console.error('Error al obtener imagenes', err);
                 }
-                return [];
+                return of([]);
             })
         );
     }

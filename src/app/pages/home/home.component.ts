@@ -41,7 +41,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private router: Router,
-    private _cartService: CartService,
     private _articuloService: ArticuloService,
     private _configClienteService: ConfigClienteService,
     private _socketService: SocketService,
@@ -49,10 +48,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private _sessionService: SessionService,
     private _toastrService: ToastrService
   ) { }
-
-  get cartLength(): number {
-    return this._cartService.getCart()?.length ?? 0;
-  }
 
   ngOnInit(): void {
     this.cargaInicial();

@@ -16,7 +16,6 @@ export class CartService {
     this.cartCount.next(this.cartItems.length);
   }
 
-  // -- Storage helpers --
   private load(): CartItem[] {
     try {
       const raw = localStorage.getItem(this.KEY);
@@ -31,52 +30,58 @@ export class CartService {
     this.cartCount.next(this.cartItems.length);
   }
 
-  // -- API pública (respetando tus nombres) --
-  /** Devuelve una copia sincronizada con storage */
-  getCart(): CartItem[] {
-    this.cartItems = this.load();
-    return [...this.cartItems];
-  }
+  // add(item: CartItem): void {
+  //   const id = item.id ?? item.articulo.CODIGO ?? item.articulo.DESCRIP;
+  //   const precio = Number(item.articulo.PRECIO ?? 0);
+  //   const pack = this.getPackSize(item);
+  //   const incQty = Math.max(1, Number(item.cantidad ?? 1));
 
-  /** Agrega (o incrementa si ya existe) */
-  add(item: CartItem): void {
-    const id = item.id ?? item.articulo.CODIGO ?? item.articulo.DESCRIP;
-    const precio = Number(item.articulo.PRECIO ?? 0);
-    const cantidad = Math.max(1, Number(item.cantidad ?? 1));
+  //   // const idx = this.cartItems.findIndex(
+  //   //   x => (x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === id
+  //   // );
+  //   this.cartItems = this.load();
+  //   const idx = this.findIndexById(id);
 
-    const idx = this.cartItems.findIndex(
-      x => (x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === id
-    );
+  //   if (idx > -1) {
+  //     const cur = this.cartItems[idx];
+  //     const currentQty = Math.max(1, Number(cur.cantidad ?? 1));
+  //     const desired = currentQty + incQty;
+  //     const snapped = this.snapToPack(desired, pack);
+  //     // this.cartItems[idx] = { ...cur, cantidad: snapped, _pack: pack };
+  //   } else {
+  //     // primera vez: al menos un pack
+  //     const initial = Math.max(incQty, pack);
+  //     const snapped = this.snapToPack(initial, pack);
+  //     // this.cartItems.push({ ...item, id, precio, cantidad: snapped, _pack: pack });
+  //   }
 
-    if (idx > -1) {
-      const cur = this.cartItems[idx];
-      const newQty = Math.max(1, Number(cur.cantidad ?? 1) + cantidad);
-      this.cartItems[idx] = { ...cur, cantidad: newQty };
-    } else {
-      this.cartItems.push({ ...item, id, cantidad });
-    }
+  //   this.save();
+  //   // console.info(`Empaque x${pack}. Cantidad ajustada a múltiplo.`);
+  // }
 
-    this.save();
-    console.log('Producto agregado al carrito:', item);
-  }
-
-  /** Actualiza cantidad de una línea del carrito */
-  actualizarCantidad(idOCodigo: string | number, qty: number) {
-    const idStr = String(idOCodigo);
-    const idx = this.cartItems.findIndex(
-      x => String(x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === idStr
-    );
-    if (idx > -1) {
-      this.cartItems[idx].cantidad = Math.max(1, Number(qty) || 1);
-      this.save();
-    }
-  }
+  // /** Actualiza cantidad y la ajusta al múltiplo del pack. */
+  // actualizarCantidad(idOCodigo: string | number, qty: number) {
+  //   // const idStr = String(idOCodigo);
+  //   // const idx = this.cartItems.findIndex(
+  //   //   x => String(x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) === idStr
+  //   // );
+  //   this.cartItems = this.load();
+  //   const idx = this.findIndexById(idOCodigo);
+  //   if (idx > -1) {
+  //     const pack = this.getPackSize(this.cartItems[idx]);
+  //     this.cartItems[idx].cantidad = this.snapToPack(qty, pack);
+  //     // this.cartItems[idx]._pack = pack;
+  //     this.save();
+  //   }
+  // }
 
   /** Elimina una línea del carrito */
   eliminarItem(idOCodigo: string | number) {
+    this.cartItems = this.load();
     const idStr = String(idOCodigo);
     this.cartItems = this.cartItems.filter(
       x => String(x.id ?? x.articulo.CODIGO ?? x.articulo.DESCRIP) !== idStr
+      // x => String(this.getId(x)) !== idStr
     );
     this.save();
   }
@@ -92,7 +97,6 @@ export class CartService {
   }
 
   // -- Aliases que ya usabas --
-  agregarProducto(producto: any) { this.add(producto); }
-  obtenerCarrito(): any[] { return this.getCart(); }
+  // agregarProducto(producto: any) { this.add(producto); }
   limpiarCarrito(): void { this.clearCart(); }
 }
