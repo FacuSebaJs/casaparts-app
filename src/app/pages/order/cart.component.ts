@@ -31,15 +31,9 @@ export class CartComponent implements OnInit {
   }
 
   async cargaInicial() {
-    // const list = this.cartService.obtenerCarrito() || [];
     const cliente = this._sessionService.getUser();
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
-    console.log("LIST:", list);
-    this.carrito = (list as any[]).map(x => ({
-      ...x,
-      // precio: Number(x.precio) || 0,
-      // cantidad: Number(x.cantidad ?? 1)
-    }));
+    this.carrito = list;
     this.cargarDatosVacios(this.carrito.length);
     this.cargarTotales();
     await this.obtenerImagenes();
@@ -49,31 +43,26 @@ export class CartComponent implements OnInit {
     this.total = 0;
     for (let i = 0; i < this.carrito.length; i++) {
       this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
-      this.total += this.totales[i];
+      this.total = this.twoDecimal(this.total + this.totales[i]);
     }
-    console.log(this.totales);
-    console.log(this.total);
   }
 
   private twoDecimal(value: any) {
     return Number(Number(value).toFixed(2));
   }
 
-  // Eliminar ítem (se mantiene)
-  eliminar(it: CartItem) {
-    const id = it.id ?? (it as any).codigo ?? it.articulo.DESCRIP as any;
-    const svc: any = this.cartService;
-    if (typeof svc.eliminarItem === 'function') svc.eliminarItem(id);
-    this.carrito = this.carrito.filter(x => x !== it);
+  async eliminar(index: number) {
+    const cliente = this._sessionService.getUser();
+    try {
+      await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
+      this.carrito.splice(index, 1);
+    }
+    catch (err) {
+      console.error('Error al eliminar artículo', err);
+      throw err;
+    }
   }
 
-  private syncQty(it: CartItem) {
-    const id = it.id ?? (it as any).codigo ?? it.articulo.DESCRIP as any;
-    const svc: any = this.cartService;
-    if (typeof svc.actualizarCantidad === 'function') svc.actualizarCantidad(id, it.cantidad);
-  }
-
-  // Navegar al paso de checkout (detalles de entrega/pago)
   irAConfirmar() {
     if (!this.canProceed) return;
     this.router.navigate(['/checkout']);

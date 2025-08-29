@@ -45,6 +45,19 @@ export class OrderService {
         );
     }
 
+    public deleteArt(cliente: any, id: number): Observable<any> {
+        const url = `${environment.API_URL}/pedido_detalle/${id}`;
+        return this.http.delete<any>(url, { responseType: 'json', headers: { cliente: cliente } }).pipe(
+            map(resp => {
+                return resp;
+            }),
+            catchError(err => {
+                console.error('Error al obtener íconos de compra', err);
+                return of(null);
+            })
+        );
+    }
+
     private getOne(id: number): Observable<any> {
         let url: string = `${environment.API_URL}/pedido/getOne/${id}`;
         return this.http.get<any>(url, { responseType: 'json' }).pipe(

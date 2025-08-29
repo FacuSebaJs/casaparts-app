@@ -18,8 +18,8 @@
             <span>• {{ it.articulo.CODIGO }}</span>
           </div>
           <div class="qty">
-            <span> Cant.: <strong>{{ it?.cantidad ?? 1 }}</strong> </span>
-            <button class="btn-link danger" (click)="eliminar(it)">Eliminar</button>
+            <span> Cantidad: <strong>{{ it.cantidad }}</strong> </span>
+            <button class="btn-link danger" (click)="eliminar(i)">Eliminar</button>
           </div>
         </div>
         <div class="price">
