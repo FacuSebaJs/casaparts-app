@@ -1,11 +1,18 @@
 <h2 class="page-title">Resumen del Pedido</h2>
-<section *ngIf="(carrito?.length ?? 0) === 0; else hasItems" class="empty">
+<section *ngIf="carrito && carrito.length == 0; else hasItems" class="empty" [hidden]="spinner">
   <p>No hay productos en el carrito.</p>
   <button class="btn-secondary" (click)="volver()">Volver</button>
 </section>
 <ng-template #hasItems>
-  <div class="checkout">
-    <section class="items">
+  <div class="checkout" style="position: relative;">
+    <div *ngIf="spinner"
+      style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px; background-color: transparent;">
+      <div class="spinner-border text-dark" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-black mt-2">Cargando pedido...</p>
+    </div>
+    <section class="items" *ngIf="!spinner && carrito">
       <article class="item" *ngFor="let it of carrito; let i = index; trackBy: trackByIndex">
         <img class="thumb" *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
           alt="Sin foto" style="width: 100%; height: 100%;" />
@@ -29,13 +36,13 @@
         </div>
       </article>
     </section>
-    <aside class="summary">
+    <aside class="summary" *ngIf="!spinner && carrito">
       <section class="card totals">
         <div class="row">
           <span>Total</span>
           <span class="total">{{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
         </div>
-        <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="irAConfirmar()">
+        <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="confirmar()">
           Confirmar pedido
         </button>
         <button class="btn-link" (click)="volver()">Volver</button>
@@ -43,7 +50,7 @@
     </aside>
   </div>
   <footer class="sticky-footer" *ngIf="(carrito?.length ?? 0) > 0">
-    <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
-    <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="irAConfirmar()">Confirmar pedido</button>
+    <div class="sf-total">Total: {{ 0 | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
+    <button class="btn-primary btn-ml" [disabled]="true">Confirmar pedido</button>
   </footer>
 </ng-template>

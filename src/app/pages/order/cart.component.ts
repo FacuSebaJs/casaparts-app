@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartService, CartItem } from '../../core/services/api/cart.service';
+import { CartItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
 import { ArticuloService } from '../../core/services/api/articulo.service';
+import { SocketService } from '../../core/services/socket.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-cart',
@@ -12,15 +14,18 @@ import { ArticuloService } from '../../core/services/api/articulo.service';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   carrito: CartItem[] = [];
   imagenes: string[] = [];
   totales: number[] = [];
-  private cancelador$ = new Subject<void>();
   total: number = 0;
+  spinner: boolean = false;
+  cancelador$ = new Subject<void>();
+  obsChangedOrderDetail = new Subscription();
+  unsubscribe$ = new Subject<void>();
 
-
-  constructor(private cartService: CartService, private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService) { }
+  constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService) {
+  }
 
   trackByIndex(i: number) { return i; }
 
@@ -28,27 +33,12 @@ export class CartComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargaInicial();
+    this.initSocket();
   }
 
-  async cargaInicial() {
-    const cliente = this._sessionService.getUser();
-    const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
-    this.carrito = list;
-    this.cargarDatosVacios(this.carrito.length);
-    this.cargarTotales();
-    await this.obtenerImagenes();
-  }
-
-  cargarTotales() {
-    this.total = 0;
-    for (let i = 0; i < this.carrito.length; i++) {
-      this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
-      this.total = this.twoDecimal(this.total + this.totales[i]);
-    }
-  }
-
-  private twoDecimal(value: any) {
-    return Number(Number(value).toFixed(2));
+  ngOnDestroy(): void {
+    this.removeListener();
+    this.removeSockets();
   }
 
   async eliminar(index: number) {
@@ -63,14 +53,52 @@ export class CartComponent implements OnInit {
     }
   }
 
-  irAConfirmar() {
-    if (!this.canProceed) return;
-    this.router.navigate(['/checkout']);
+  async confirmar() {
+    try {
+      this.spinner = true;
+      await firstValueFrom(this._orderService.sendOrder(this.carrito[0].id_pedido, null));
+      this.carrito = [];
+    }
+    catch (err) {
+      console.error('Error al confirmar pedido', err);
+      throw err;
+    }
+    finally {
+      this.spinner = false;
+    }
   }
+
+  // irAConfirmar() {
+  //   if (!this.canProceed) return;
+  //   this.router.navigate(['/checkout']);
+  // }
 
   volver() { this.router.navigate(['/']); }
 
-  async obtenerImagen(codigo: string) {
+  private async cargaInicial() {
+    this.spinner = true;
+    const cliente = this._sessionService.getUser();
+    const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
+    this.cargarDatosVacios(list.length);
+    this.carrito = list;
+    this.cargarTotales();
+    await this.obtenerImagenes();
+    this.spinner = false;
+  }
+
+  private cargarTotales() {
+    this.total = 0;
+    for (let i = 0; i < this.carrito.length; i++) {
+      this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
+      this.total = this.twoDecimal(this.total + this.totales[i]);
+    }
+  }
+
+  private twoDecimal(value: any) {
+    return Number(Number(value).toFixed(2));
+  }
+
+  private async obtenerImagen(codigo: string) {
     try {
       const imagenes = await firstValueFrom(this._articuloService.getUrlImages(codigo)
         .pipe(takeUntil(this.cancelador$)));
@@ -86,7 +114,7 @@ export class CartComponent implements OnInit {
     }
   }
 
-  async obtenerImagenes() {
+  private async obtenerImagenes() {
     try {
       for (let i = 0; i < this.carrito.length; i++) {
         const imagen = await this.obtenerImagen(this.carrito[i].articulo.CODIGO);
@@ -97,10 +125,42 @@ export class CartComponent implements OnInit {
     }
   }
 
-  async cargarDatosVacios(length: number) {
+  private async cargarDatosVacios(length: number) {
     this.imagenes = Array(length).fill("");
     this.totales = Array(length).fill(0);
     this.cancelador$.next();
+  }
+
+  private initSocket(): void {
+    if (this.obsChangedOrderDetail) {
+      this.obsChangedOrderDetail.unsubscribe();
+    }
+    this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(async (data) => {
+        this.spinner = true;
+        const action: string = data == 'agregar' ? 'agregado' : data == 'quitar' ? 'quitado' : 'modificado';
+        let message: string = `Se ha ${action} artículo/s en su compra`;
+        if (data == 'iniciar') {
+          message = `Se ha iniciado una nueva compra`;
+        }
+        if (data != 'quitar') {
+          this._toastrService.info(message, 'Información');
+        }
+        await this.cargaInicial();
+        this.spinner = false;
+      })
+  }
+
+  private removeListener() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  private removeSockets() {
+    if (this.obsChangedOrderDetail) {
+      this.obsChangedOrderDetail.unsubscribe();
+    }
   }
 
 }

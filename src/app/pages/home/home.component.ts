@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartService } from '../../core/services/api/cart.service';
 import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
@@ -19,35 +18,28 @@ import { Carousel, Dropdown } from 'bootstrap';
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('carouselOfertas', { static: false }) carouselElement!: ElementRef;
-  carouselInstance: any;
-  cargandoProductos = false;
-  errorProductos = '';
+  carouselInstance?: Carousel;
+  cargandoProductos: boolean = false;
+  errorProductos: string = '';
   articulos: any[] = [];
   busqueda: string = '';
-  imagenes: string[] = [];
+  imagenes: any[] = [];
   spinner: boolean = false;
-  configCliente: { general: number | null, contado: number | null, tarjeta: number | null, descuento: number | null } = { general: null, contado: null, tarjeta: null, descuento: null };
-  precios: { costo: number | null, venta: number | null, contado: number | null, tarjeta: number | null }[] = [];
+  configCliente = { general: null, contado: null, tarjeta: null, descuento: null };
+  precios: any[] = [];
   indexImagen: number = 0;
-  private cancelador$ = new Subject<void>();
-  private slideListener: any;
-  private readonly unsubscribe$: Subject<void> = new Subject<void>();
-  private obsSocConnect: Subscription = new Subscription();
-  private obsSocRoom: Subscription = new Subscription();
-  private obsChangedOrder: Subscription = new Subscription();
-  private obsChangedOrderDetail: Subscription = new Subscription();
-  cliente: string | null = null;
+  cancelador$ = new Subject<void>();
+  unsubscribe$ = new Subject<void>();
+  obsSocConnect = new Subscription();
+  obsSocRoom = new Subscription();
+  obsChangedOrder = new Subscription();
+  obsChangedOrderDetail = new Subscription();
+  cliente: any = null;
   articulosCarrito: number = 0;
+  slideListener: EventListener | null = null;
 
-  constructor(
-    private router: Router,
-    private _articuloService: ArticuloService,
-    private _configClienteService: ConfigClienteService,
-    private _socketService: SocketService,
-    private _orderService: OrderService,
-    private _sessionService: SessionService,
-    private _toastrService: ToastrService
-  ) { }
+  constructor(private router: Router, private _articuloService: ArticuloService, private _configClienteService: ConfigClienteService, private _socketService: SocketService, private _orderService: OrderService, private _sessionService: SessionService, private _toastrService: ToastrService) {
+  }
 
   ngOnInit(): void {
     this.cargaInicial();
@@ -55,6 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.removeListener();
+    this.removeSockets();
   }
 
   ngAfterViewInit(): void {
@@ -337,7 +330,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.obsChangedOrderDetail) {
       this.obsChangedOrderDetail.unsubscribe();
     }
-    this._socketService.disconnect();
+    // this._socketService.disconnect();
   }
 
   async refreshIcon() {

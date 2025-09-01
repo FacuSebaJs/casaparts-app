@@ -25,7 +25,8 @@ export class OrderService {
     }
 
     getBuy(cliente: any): Observable<any[]> {
-        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1`;
+        const prepedido: boolean = true;
+        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1/${prepedido}`;
         return this.http.get<any[]>(url).pipe(
             switchMap(orderHeader => {
                 if (orderHeader && orderHeader.length) {
@@ -39,13 +40,57 @@ export class OrderService {
                 }
             }),
             catchError(err => {
-                console.error('Error al obtener cantidad de artículos', err);
+                console.error('Error al obtener pre-pedido', err);
                 return of([]);
             })
         );
     }
 
-    public deleteArt(cliente: any, id: number): Observable<any> {
+    getLatestOrders(cliente: any): Observable<any[]> {
+        const prepedido: boolean = false;
+        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1/${prepedido}`;
+        return this.http.get<any[]>(url).pipe(
+            switchMap(orderHeader => {
+                if (orderHeader && orderHeader.length) {
+                    return this.getOne(orderHeader[0].id).pipe(
+                        map((order: any) => {
+                            return order?.detalle || [];
+                        })
+                    );
+                } else {
+                    return of([]);
+                }
+            }),
+            catchError(err => {
+                console.error('Error al obtener últimos pedidos', err);
+                return of([]);
+            })
+        );
+    }
+
+    getAllOrders(cliente: any): Observable<any[]> {
+        const prepedido: boolean = false;
+        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/0/${prepedido}`;
+        return this.http.get<any[]>(url).pipe(
+            switchMap(orderHeader => {
+                if (orderHeader && orderHeader.length) {
+                    return this.getOne(orderHeader[0].id).pipe(
+                        map((order: any) => {
+                            return order?.detalle || [];
+                        })
+                    );
+                } else {
+                    return of([]);
+                }
+            }),
+            catchError(err => {
+                console.error('Error al obtener todos los pedidos', err);
+                return of([]);
+            })
+        );
+    }
+
+    deleteArt(cliente: any, id: number): Observable<any> {
         const url = `${environment.API_URL}/pedido_detalle/${id}`;
         return this.http.delete<any>(url, { responseType: 'json', headers: { cliente: cliente } }).pipe(
             map(resp => {
@@ -54,6 +99,19 @@ export class OrderService {
             catchError(err => {
                 console.error('Error al obtener íconos de compra', err);
                 return of(null);
+            })
+        );
+    }
+
+    sendOrder(id: number, nota: string | null = null) {
+        const url = `${environment.API_URL}/pedido/setStatus/${id}`;
+        return this.http.patch<any>(url, { estado: 1, nota: nota }, { responseType: 'json' }).pipe(
+            map((order: any) => {
+                return order;
+            }),
+            catchError(err => {
+                console.error(`Error al obtener el pedido ${id}`, err);
+                return of();
             })
         );
     }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-login',
@@ -9,12 +10,12 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   cliente: number | null = null;
   clave: string = '';
   Email: string = '';
 
-  constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService) { }
+  constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService, private _socketService: SocketService) { }
 
   ingresar() {
     this._authService.login(this.cliente, this.Email, this.clave).subscribe({
@@ -40,4 +41,9 @@ export class LoginComponent {
     });
 
   }
+
+  ngOnInit() {
+    this._socketService.disconnect();
+  }
+
 }
