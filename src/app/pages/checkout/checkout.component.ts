@@ -24,7 +24,8 @@ export class CheckoutComponent implements OnInit {
   constructor(private cart: CartService, private router: Router) {}
 
   ngOnInit(): void {
-    this.carrito = this.cart.obtenerCarrito() || [];
+    // this.carrito = this.cart.obtenerCarrito() || [];
+    this.carrito=[];
     if (this.carrito.length === 0) this.router.navigate(['/cart']);
     this.recalcShipping();
   }

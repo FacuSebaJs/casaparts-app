@@ -150,3 +150,7 @@
     </ng-container>
   </div>
 </div>
+
+<app-ordered-quantity [art]="selectedArt" [openModal]="openModalOrderedQuantity.asObservable()"
+  (closingAction)="reanudarCarrusel()">
+</app-ordered-quantity>

@@ -1,0 +1,60 @@
+<button [hidden]="true" #buttonOpenModal type="button" class="btn btn-primary" data-bs-toggle="modal"
+    data-bs-target="#orderedQuantityModal">
+</button>
+<div class="modal fade" id="orderedQuantityModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <form (submit)="accept()" action="submit">
+                <div *ngIf="art" class="modal-body">
+                    <button hidden #buttonCloseModal type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close" (click)="close()">
+                    </button>
+                    <div class="mb-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Cantidad</th>
+                                        <th>Envase</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ art.CODIGO }}</td>
+                                        <td>{{ cantidad }}</td>
+                                        <td>{{ art.ENVASE ? art.ENVASE : 1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="table-secondary">Descripción</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" style="text-transform: uppercase;">
+                                            {{ art.DESCRIP }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mb-3 row align-items-center">
+                        <label for="cantidadInput" class="col-12 col-sm-3 col-form-label">Cantidad:</label>
+                        <div class="col-12 col-sm-9">
+                            <input #refCantidadInput [disabled]="art.QSTOCK == 'N' || art.QSTOCK == 'X'"
+                                [(ngModel)]="cantidadInput" name="cantidadInput" id="cantidadInput" type="number"
+                                class="form-control" [step]="art.ENVASE || 1" [min]="art.ENVASE || 1"
+                                [placeholder]="art.QSTOCK == 'N' || art.QSTOCK == 'X' ? 'Sin stock' : 'Ingrese una cantidad'">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-danger w-45" (click)="close()">Cerrar</button>
+                    <button [disabled]="!cantidadInput" type="submit" class="btn btn-primary w-45">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

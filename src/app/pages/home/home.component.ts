@@ -36,7 +36,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   obsChangedOrderDetail = new Subscription();
   cliente: any = null;
   articulosCarrito: number = 0;
+  selectedArt: any = null;
   slideListener: EventListener | null = null;
+  openModalOrderedQuantity = new Subject<void>();
 
   constructor(private router: Router, private _articuloService: ArticuloService, private _configClienteService: ConfigClienteService, private _socketService: SocketService, private _orderService: OrderService, private _sessionService: SessionService, private _toastrService: ToastrService) {
   }
@@ -113,9 +115,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initSocket();
   }
 
-  agregarAlCarrito(p: any): void {
+  agregarAlCarrito(item: any): void {
     // const item = this.mapProductoAItem(p);
     // this._cartService.add(item);
+    this.pausarCarrusel();
+    this.selectedArt = item;
+    this.openModalOrderedQuantity.next();
   }
 
   private mapProductoAItem(p: any) {
