@@ -27,9 +27,13 @@ export class CartComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService) {
   }
 
-  trackByIndex(i: number): number { return i; }
+  trackByIndex(i: number): number {
+    return i;
+  }
 
-  get canProceed(): boolean { return (this.carrito?.length ?? 0) > 0; }
+  get canProceed(): boolean {
+    return (this.carrito?.length ?? 0) > 0;
+  }
 
   ngOnInit(): void {
     this.cargaInicial();
@@ -46,6 +50,8 @@ export class CartComponent implements OnInit, OnDestroy {
     try {
       await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
       this.carrito.splice(index, 1);
+      this.totales.splice(index, 1);
+      this.imagenes.splice(index, 1);
     }
     catch (err) {
       console.error('Error al eliminar artículo', err);
@@ -68,12 +74,9 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  // irAConfirmar(): void{
-  //   if (!this.canProceed) return;
-  //   this.router.navigate(['/checkout']);
-  // }
-
-  volver(): void { this.router.navigate(['/']); }
+  volver(): void {
+    this.router.navigate(['/']);
+  }
 
   private async cargaInicial(): Promise<void> {
     this.spinner = true;
