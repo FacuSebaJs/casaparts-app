@@ -27,7 +27,7 @@ export class CartComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService) {
   }
 
-  trackByIndex(i: number) { return i; }
+  trackByIndex(i: number): number { return i; }
 
   get canProceed(): boolean { return (this.carrito?.length ?? 0) > 0; }
 
@@ -41,7 +41,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.removeSockets();
   }
 
-  async eliminar(index: number) {
+  async eliminar(index: number): Promise<void> {
     const cliente = this._sessionService.getUser();
     try {
       await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
@@ -53,7 +53,7 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  async confirmar() {
+  async confirmar(): Promise<void> {
     try {
       this.spinner = true;
       await firstValueFrom(this._orderService.sendOrder(this.carrito[0].id_pedido, null));
@@ -68,14 +68,14 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  // irAConfirmar() {
+  // irAConfirmar(): void{
   //   if (!this.canProceed) return;
   //   this.router.navigate(['/checkout']);
   // }
 
-  volver() { this.router.navigate(['/']); }
+  volver(): void { this.router.navigate(['/']); }
 
-  private async cargaInicial() {
+  private async cargaInicial(): Promise<void> {
     this.spinner = true;
     const cliente = this._sessionService.getUser();
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
@@ -86,7 +86,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.spinner = false;
   }
 
-  private cargarTotales() {
+  private cargarTotales(): void {
     this.total = 0;
     for (let i = 0; i < this.carrito.length; i++) {
       this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
@@ -94,11 +94,11 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  private twoDecimal(value: any) {
+  private twoDecimal(value: any): number {
     return Number(Number(value).toFixed(2));
   }
 
-  private async obtenerImagen(codigo: string) {
+  private async obtenerImagen(codigo: string): Promise<any> {
     try {
       const imagenes = await firstValueFrom(this._articuloService.getUrlImages(codigo)
         .pipe(takeUntil(this.cancelador$)));
@@ -114,7 +114,7 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async obtenerImagenes() {
+  private async obtenerImagenes(): Promise<void> {
     try {
       for (let i = 0; i < this.carrito.length; i++) {
         const imagen = await this.obtenerImagen(this.carrito[i].articulo.CODIGO);
@@ -125,7 +125,7 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async cargarDatosVacios(length: number) {
+  private async cargarDatosVacios(length: number): Promise<void> {
     this.imagenes = Array(length).fill("");
     this.totales = Array(length).fill(0);
     this.cancelador$.next();
@@ -152,12 +152,12 @@ export class CartComponent implements OnInit, OnDestroy {
       })
   }
 
-  private removeListener() {
+  private removeListener(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
-  private removeSockets() {
+  private removeSockets(): void {
     if (this.obsChangedOrderDetail) {
       this.obsChangedOrderDetail.unsubscribe();
     }

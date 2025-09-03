@@ -23,7 +23,7 @@ export class ArticuloService {
         );
     }
 
-    getUrlImages(codigo: string) {
+    getUrlImages(codigo: string): Observable<any[]> {
         let url: string = `${environment.IMAGES_URL}/getFormatImgArticulo/${codigo}`;
         return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
             map(images => {

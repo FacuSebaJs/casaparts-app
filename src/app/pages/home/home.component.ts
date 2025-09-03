@@ -56,7 +56,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initCarrusel();
   }
 
-  initCarrusel() {
+  initCarrusel(): void {
     this.removeListener();
     if (this.carouselInstance) {
       this.carouselInstance.dispose();
@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  removeListener() {
+  removeListener(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     const el = this.carouselElement?.nativeElement;
@@ -104,7 +104,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async cargaInicial() {
+  async cargaInicial(): Promise<void> {
     this.cliente = this._sessionService.getUser();
     this.spinner = true;
     await this.cargarConfigCliente();
@@ -133,7 +133,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.cancelador$.next();
   }
 
-  pausarCarrusel() {
+  pausarCarrusel(): void {
     if (this.carouselInstance) {
       this.carouselInstance.pause();
     }
@@ -142,7 +142,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  reanudarCarrusel() {
+  reanudarCarrusel(): void {
     if (this.carouselInstance) {
       this.carouselInstance.cycle();
     }
@@ -170,7 +170,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async buscar() {
+  async buscar(): Promise<void> {
     this.pausarCarrusel();
     if (this.busqueda == '') {
       await this.cargarnovedades();
@@ -182,7 +182,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => this.initCarrusel());
   }
 
-  async filtrar() {
+  async filtrar(): Promise<void> {
     try {
       this.spinner = true;
       this.imagenes[this.indexImagen] = '';
@@ -200,7 +200,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async cargarnovedades() {
+  async cargarnovedades(): Promise<void> {
     try {
       const articulos = await firstValueFrom(this._articuloService.getNov(Number(this.cliente)));
       await this.cargarDatosVacios(articulos);
@@ -213,7 +213,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async cargarConfigCliente() {
+  async cargarConfigCliente(): Promise<void> {
     try {
       const configCliente = await firstValueFrom(this._configClienteService.getConfig(Number(this.cliente)));
       this.configCliente = configCliente;
@@ -296,7 +296,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       })
   }
 
-  removeSockets() {
+  removeSockets(): void {
     if (this.obsSocConnect) {
       this.obsSocConnect.unsubscribe();
     }
@@ -311,7 +311,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async refreshIcon() {
+  async refreshIcon(): Promise<void> {
     const articulos = await firstValueFrom(this._orderService.getBuyIcon(this.cliente));
     if (this.articulos) {
       let data = JSON.stringify(this.articulos);
@@ -337,6 +337,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.articulos = arts;
     }
+  }
+
+  closedModal(): void {
+    this.reanudarCarrusel();
+    this.refreshIcon();
   }
 
 }

@@ -25,7 +25,7 @@ export class CartService {
     }
   }
 
-  private save() {
+  private save(): void {
     localStorage.setItem(this.KEY, JSON.stringify(this.cartItems));
     this.cartCount.next(this.cartItems.length);
   }

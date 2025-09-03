@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService, private _socketService: SocketService) { }
 
-  ingresar() {
+  ingresar(): void {
     this._authService.login(this.cliente, this.Email, this.clave).subscribe({
       next: (response: any) => {
         if (response.acceso_permitido == true) {
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
 
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._socketService.disconnect();
   }
 

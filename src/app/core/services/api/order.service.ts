@@ -103,7 +103,7 @@ export class OrderService {
         );
     }
 
-    sendOrder(id: number, nota: string | null = null) {
+    sendOrder(id: number, nota: string | null = null): Observable<any> {
         const url = `${environment.API_URL}/pedido/setStatus/${id}`;
         return this.http.patch<any>(url, { estado: 1, nota: nota }, { responseType: 'json' }).pipe(
             map((order: any) => {
@@ -116,7 +116,7 @@ export class OrderService {
         );
     }
 
-    newDetail(pedido: any, detalle: any) {
+    newDetail(pedido: any, detalle: any): Observable<any> {
         const url = `${environment.API_URL}/pedido_detalle/newDetail`;
         return this.http.post<any>(url, { pedido: pedido, detalle: detalle }, { responseType: 'json' }).pipe(
             map((order: any) => {

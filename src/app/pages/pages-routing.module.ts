@@ -19,11 +19,6 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then(m => m.HomeModule),
     canActivate: [sessionGuard]
   },
-  // {
-  //   path: 'checkout',
-  //   loadChildren: () => import('./checkout/checkout.module').then(m => m.CheckoutModule),
-  //   canActivate: [sessionGuard]
-  // },
   {
     path: 'order',
     loadChildren: () => import('./order/order.module').then(m => m.OrderModule),

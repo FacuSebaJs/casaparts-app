@@ -26,13 +26,13 @@ export class MenuDropdownComponent implements OnInit {
         this.cargaInicial();
     }
 
-    async cargaInicial() {
+    async cargaInicial(): Promise<void> {
         this.cliente = this._sessionService.getUser();
         await this.cargarCarrito();
         this.initSocket();
     }
 
-    toggleMenu(force: boolean, show?: boolean) {
+    toggleMenu(force: boolean, show?: boolean): void {
         const dropdownButton = document.getElementById("dropdownMenuButton");
         if (dropdownButton) {
             const dropdownInstance = Dropdown.getOrCreateInstance(dropdownButton);
@@ -54,7 +54,9 @@ export class MenuDropdownComponent implements OnInit {
     }
 
     irAlCarrito(): void {
-        this.router.navigate(['/order']);
+        if (this.articulosCarrito > 0) {
+            this.router.navigate(['/order']);
+        }
     }
 
     logout(): void {
@@ -64,7 +66,7 @@ export class MenuDropdownComponent implements OnInit {
         window.location.reload();
     }
 
-    removeSockets() {
+    removeSockets(): void {
         if (this.obsChangedOrderDetail) {
             this.obsChangedOrderDetail.unsubscribe();
         }
@@ -78,7 +80,7 @@ export class MenuDropdownComponent implements OnInit {
         }
     }
 
-    async cargarCarrito() {
+    async cargarCarrito(): Promise<void> {
         try {
             const buy = await firstValueFrom(this._orderService.getBuy(this.cliente));
             this.articulosCarrito = buy.length;

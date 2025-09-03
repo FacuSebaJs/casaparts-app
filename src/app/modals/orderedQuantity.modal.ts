@@ -51,7 +51,7 @@ export class OrderedQuantityModal implements OnInit {
       });
   }
 
-  close() {
+  close(): void {
     this.cantidadInput = null;
     this.buttonCloseModal.nativeElement.click();
     this.closingAction.emit();
@@ -80,7 +80,7 @@ export class OrderedQuantityModal implements OnInit {
     }
   }
 
-  async cargarConfigCliente() {
+  async cargarConfigCliente(): Promise<void> {
     try {
       const configCliente = await firstValueFrom(this._configClienteService.getConfig(Number(this.cliente)));
       this.configCliente = configCliente;
@@ -90,7 +90,7 @@ export class OrderedQuantityModal implements OnInit {
     }
   }
 
-  async calcularPrecio(articulo: any) {
+  async calcularPrecio(articulo: any): Promise<any> {
     try {
       const coeficientes = await firstValueFrom(this._articuloService.getCoefArt(Number(this.cliente), articulo.CODIGO));
       let precio = { costo: 0, venta: 0, contado: 0, tarjeta: 0 };
@@ -111,7 +111,7 @@ export class OrderedQuantityModal implements OnInit {
     }
   }
 
-  private twoDecimal(value: any) {
+  private twoDecimal(value: any): number {
     return Number(Number(value).toFixed(2));
   }
 

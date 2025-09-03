@@ -7,7 +7,7 @@ export class SessionService {
 
     constructor(private _router: Router) { }
 
-    public async checkSession(response: Partial<HttpResponse<any>>): Promise<any> {
+    async checkSession(response: Partial<HttpResponse<any>>): Promise<any> {
         try {
             if (response.status == 401) {
                 let message: string = 'Debe logearse para poder usar la aplicación';
@@ -25,7 +25,7 @@ export class SessionService {
         }
     }
 
-    public getUser() {
+    getUser(): string | null {
         const user = localStorage.getItem('user');
         if (user) {
             return user;
@@ -36,29 +36,29 @@ export class SessionService {
         }
     }
 
-    public setUser(user: string) {
+    setUser(user: string): void {
         localStorage.setItem('user', user);
     }
 
 
-    public getToken() {
+    getToken(): string | null {
         return localStorage.getItem('token');
     }
 
-    public setToken(token: string) {
+    setToken(token: string): void {
         localStorage.setItem('token', token);
     }
 
-    public removeToken() {
+    removeToken(): void {
         localStorage.removeItem('token');
     }
 
-    public getBuy() {
+    getBuy(): any | [] {
         const buy = localStorage.getItem('buy');
         return buy ? JSON.parse(buy) : [];
     }
 
-    public setBuy(buy: any) {
+    setBuy(buy: any): void {
         localStorage.setItem('buy', JSON.stringify(buy));
     }
 
