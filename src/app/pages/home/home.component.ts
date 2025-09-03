@@ -116,27 +116,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   agregarAlCarrito(item: any): void {
-    // const item = this.mapProductoAItem(p);
-    // this._cartService.add(item);
     this.pausarCarrusel();
     this.selectedArt = item;
     this.openModalOrderedQuantity.next();
-  }
-
-  private mapProductoAItem(p: any) {
-    // Intentamos cubrir tus posibles campos (DESCRIP, CODIGO, MARCA, PRECIO, etc.)
-    const precioPosibles = [
-      p.PRECIO, p.precio, p.PRECIO_LISTA, p.PRECIOFINAL, p.price
-    ].map((x: any) => Number(x)).find((n: number) => !isNaN(n));
-    return {
-      id: p.id ?? p.CODIGO ?? p.codigo ?? p.sku ?? p.DESCRIP ?? p.nombre,
-      nombre: p.DESCRIP ?? p.nombre ?? p.titulo ?? 'Producto',
-      precio: precioPosibles ?? 0,
-      imagen: p.imagen ?? p.imageUrl ?? p.foto ?? null,
-      marca: p.MARCA ?? p.marca ?? p.brand ?? null,
-      codigo: p.CODIGO ?? p.codigo ?? p.sku ?? null,
-      cantidad: 1
-    };
   }
 
   irAlCarrito(): void {
@@ -156,11 +138,17 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.carouselInstance) {
       this.carouselInstance.pause();
     }
+    else {
+      console.warn("No existe instancia del carrusel");
+    }
   }
 
   reanudarCarrusel() {
     if (this.carouselInstance) {
       this.carouselInstance.cycle();
+    }
+    else {
+      console.warn("No existe instancia del carrusel");
     }
   }
 

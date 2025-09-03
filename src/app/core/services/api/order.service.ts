@@ -116,6 +116,19 @@ export class OrderService {
         );
     }
 
+    newDetail(pedido: any, detalle: any) {
+        const url = `${environment.API_URL}/pedido_detalle/newDetail`;
+        return this.http.post<any>(url, { pedido: pedido, detalle: detalle }, { responseType: 'json' }).pipe(
+            map((order: any) => {
+                return order;
+            }),
+            catchError(err => {
+                console.error(`Error al agregar artículo al pedido`, err);
+                return of();
+            })
+        );
+    }
+
     private getOne(id: number): Observable<any> {
         let url: string = `${environment.API_URL}/pedido/getOne/${id}`;
         return this.http.get<any>(url, { responseType: 'json' }).pipe(
