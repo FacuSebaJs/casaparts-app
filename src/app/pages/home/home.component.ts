@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedArt: any = null;
   slideListener: EventListener | null = null;
   openModalOrderedQuantity = new Subject<void>();
+  showCost: boolean = false;
 
   constructor(private router: Router, private _articuloService: ArticuloService, private _configClienteService: ConfigClienteService, private _socketService: SocketService, private _orderService: OrderService, private _sessionService: SessionService, private _toastrService: ToastrService) {
   }
@@ -242,6 +243,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       console.error('Error cargando configuración de cliente', err);
       throw err;
     }
+  }
+
+  toggleShowCost(): void {
+    this.showCost = !this.showCost;
   }
 
   private twoDecimal(value: any) {

@@ -84,9 +84,15 @@
                   <span class="text-muted" [class.invisible]="spinner">N° Original:</span>
                   <span class="fw-semibold" [class.invisible]="spinner">{{ articulo.ORIGINAL }}</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="text-muted" [class.invisible]="spinner">COSTO:</span>
-                  <span class="fw-semibold" [class.invisible]="spinner">{{ precios[i].costo | number: '1.2-2' }}</span>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center">
+                    <img src="assets/images/mas.png" alt="Mostrar costo" height="15px"
+                      style="margin-right: 10px; cursor: pointer;" (click)="toggleShowCost()" [class.invisible]="spinner">
+                    <span class="text-muted" [class.invisible]="!showCost">COSTO:</span>
+                  </div>
+                  <span class="fw-semibold text-end" [class.invisible]="!showCost">
+                    {{ precios[i].costo | number: '1.2-2' }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span class="text-muted" [class.invisible]="spinner">CONTADO:</span>
