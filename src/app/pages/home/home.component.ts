@@ -7,7 +7,7 @@ import { SocketService } from '../../core/services/socket.service';
 import { OrderService } from '../../core/services/api/order.service';
 import { SessionService } from '../../core/services/session.service';
 import { ToastrService } from 'ngx-toastr';
-import { Carousel, Dropdown } from 'bootstrap';
+import { Carousel } from 'bootstrap';
 
 
 @Component({
@@ -109,7 +109,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();
-    await this.cargarCarrito();
     this.spinner = false;
     this.reanudarCarrusel();
     this.initSocket();
@@ -291,20 +290,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(async (data) => {
-        const action: string = data == 'agregar' ? 'agregado' : 'modificado';
-        let message: string = `Se ha ${action} artículo/s en su compra`;
-        if (data == 'quitar') {
-          message = `Quitando artículos`;
-        }
-        if (data == 'iniciar') {
-          message = `Se ha iniciado una nueva compra`;
-        }
-        if (data != 'quitar') {
-          this._toastrService.info(message, 'Información');
-          this.toggleMenu(true);
-        }
-        await this.cargarCarrito();
+      .subscribe(async () => {
         await this.refreshIcon();
         return null;
       })
@@ -323,7 +309,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.obsChangedOrderDetail) {
       this.obsChangedOrderDetail.unsubscribe();
     }
-    // this._socketService.disconnect();
   }
 
   async refreshIcon() {
@@ -351,38 +336,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
       this.articulos = arts;
-    }
-  }
-
-  logout(): void {
-    this._sessionService.removeToken();
-    window.location.reload();
-  }
-
-  toggleMenu(forceShow = false) {
-    const dropdownButton = document.getElementById("dropdownMenuButton");
-    if (dropdownButton) {
-      const dropdownInstance = Dropdown.getOrCreateInstance(dropdownButton);
-      const menu = dropdownButton.nextElementSibling;
-      const isOpen = menu?.classList.contains('show');
-      if (forceShow) {
-        if (!isOpen) {
-          dropdownInstance.show();
-        }
-      }
-      else {
-        isOpen ? dropdownInstance.hide() : dropdownInstance.show();
-      }
-    }
-  }
-
-  async cargarCarrito() {
-    try {
-      const buy = await firstValueFrom(this._orderService.getBuy(this.cliente));
-      this.articulosCarrito = buy.length;
-    }
-    catch (err) {
-      console.error('Error obteniendo cantidad del carrito', err);
     }
   }
 

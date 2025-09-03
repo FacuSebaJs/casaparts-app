@@ -19,36 +19,38 @@ export class SocketService {
         this.lastChange = '';
     }
 
-    public connect(): void {
-        this.socket.connect();
-        this.socketStatus = true;
-        this.status.next(new Date());
+    connect(): void {
+        if (!this.socketStatus) {
+            this.socket.connect();
+            this.socketStatus = true;
+            this.status.next(new Date());
+        }
     }
 
-    public disconnect(): void {
+    disconnect(): void {
         if (this.socketStatus) {
             this.socket.disconnect();
             this.socketStatus = false;
         }
     }
 
-    public getStatus() {
+    getStatus() {
         return this.socketStatus;
     }
 
-    public getLastChange() {
+    getLastChange() {
         return this.lastChange;
     }
 
-    public getId() {
+    getId() {
         return this.socket.ioSocket.id;
     }
 
-    public changeStatus(): Observable<Date> {
+    changeStatus(): Observable<Date> {
         return this.status.asObservable();
     }
 
-    public connected(): Observable<any> {
+    connected(): Observable<any> {
         this.socket.removeAllListeners();
         return new Observable<any>((observer) => {
             this.socket.on('connected', (message) => {
@@ -78,17 +80,14 @@ export class SocketService {
         });
     }
 
-    private changeDetected() {
-        this.status.next(new Date());
-    }
-
-    public connectRoom(): void {
+    connectRoom(): void {
         const user = this._sessionService.getUser();
         if (user) {
             this.socket.emit('connectRoom', user);
         }
     }
-    public connectedRoom(): Observable<any> {
+
+    connectedRoom(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('connectedRoom', (message) => {
                 observer.next(message);
@@ -96,7 +95,7 @@ export class SocketService {
         });
     }
 
-    public joinedClient(): Observable<any> {
+    joinedClient(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('joinedClient', (message) => {
                 observer.next(message);
@@ -104,13 +103,13 @@ export class SocketService {
         });
     }
 
-    public changePedido(): void {
+    changePedido(): void {
         const user = this._sessionService.getUser();
         if (user) {
             this.socket.emit('changePedido', user);
         }
     }
-    public changedPedido(): Observable<any> {
+    changedPedido(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('changedPedido', (message) => {
                 observer.next(message);
@@ -118,7 +117,7 @@ export class SocketService {
         });
     }
 
-    public changedOrder(): Observable<{ order: number, isNew: boolean }> {
+    changedOrder(): Observable<{ order: number, isNew: boolean }> {
         return new Observable<{ order: number, isNew: boolean }>((observer) => {
             this.socket.on('changedOrder', (message: { order: number, isNew: boolean }) => {
                 observer.next(message);
@@ -126,7 +125,7 @@ export class SocketService {
         });
     }
 
-    public changedOrderDetail(): Observable<string> {
+    changedOrderDetail(): Observable<string> {
         return new Observable<string>((observer) => {
             this.socket.on('changedOrderDetail', (message: string) => {
                 console.log("changedOrderDetail:", message);
@@ -135,7 +134,7 @@ export class SocketService {
         });
     }
 
-    public startOrder(): Observable<any> {
+    startOrder(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('startOrder', (message) => {
                 observer.next(message);
@@ -143,13 +142,14 @@ export class SocketService {
         });
     }
 
-    public changeConfig(config: any): void {
+    changeConfig(config: any): void {
         const user = this._sessionService.getUser();
         if (user) {
             this.socket.emit('changeConfig', user, config);
         }
     }
-    public changedConfig(): Observable<any> {
+
+    changedConfig(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('changedConfig', (message) => {
                 observer.next(message);
@@ -157,13 +157,14 @@ export class SocketService {
         });
     }
 
-    public changeLocation(location: any): void {
+    changeLocation(location: any): void {
         const user = this._sessionService.getUser();
         if (user) {
             this.socket.emit('changeLocation', user, location);
         }
     }
-    public changedLocation(): Observable<any> {
+
+    changedLocation(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('changedLocation', (location) => {
                 observer.next(location);
@@ -171,7 +172,7 @@ export class SocketService {
         });
     }
 
-    public changeBanner(): Observable<any> {
+    changeBanner(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('changedBanner', () => {
                 observer.next(null);
@@ -179,7 +180,7 @@ export class SocketService {
         });
     }
 
-    public changedData(): Observable<any> {
+    changedData(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('changedData', () => {
                 observer.next(null);
@@ -187,7 +188,7 @@ export class SocketService {
         })
     }
 
-    public sendProduct(): Observable<any> {
+    sendProduct(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('sendProduct', (product) => {
                 observer.next(product);
@@ -195,12 +196,16 @@ export class SocketService {
         })
     }
 
-    public confirmExtension(): Observable<any> {
+    confirmExtension(): Observable<any> {
         return new Observable<any>((observer) => {
             this.socket.on('confirmExtension', () => {
                 observer.next(null);
             })
         })
+    }
+
+    private changeDetected() {
+        this.status.next(new Date());
     }
 
 }

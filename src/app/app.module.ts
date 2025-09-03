@@ -14,6 +14,7 @@ import { SocketService } from './core/services/socket.service';
 import localeEs from '@angular/common/locales/es-AR';
 registerLocaleData(localeEs, 'es-AR');
 import { GlobalConfig, ToastrModule } from 'ngx-toastr';
+import { MenuDropdownModule } from './pages/menu/menu-dropdown.module';
 
 const socketConfig: SocketIoConfig = {
     url: environment.SOCKET_URL, options: {
@@ -54,7 +55,8 @@ const toastConfig: Partial<GlobalConfig> = {
         FormsModule,
         ReactiveFormsModule,
         SocketIoModule.forRoot(socketConfig),
-        ToastrModule.forRoot(toastConfig)
+        ToastrModule.forRoot(toastConfig),
+        MenuDropdownModule
     ],
     providers: [
         { provide: LOCALE_ID, useValue: 'es-AR' },
