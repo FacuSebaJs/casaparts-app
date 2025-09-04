@@ -17,7 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 export class CartComponent implements OnInit, OnDestroy {
   carrito: CartItem[] = [];
   imagenes: string[] = [];
-  totales: number[] = [];
+  precios: number[] = [];
   total: number = 0;
   spinner: boolean = false;
   cancelador$ = new Subject<void>();
@@ -50,8 +50,9 @@ export class CartComponent implements OnInit, OnDestroy {
     try {
       await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
       this.carrito.splice(index, 1);
-      this.totales.splice(index, 1);
+      this.precios.splice(index, 1);
       this.imagenes.splice(index, 1);
+      this.cargarTotal();
     }
     catch (err) {
       console.error('Error al eliminar artículo', err);
@@ -84,17 +85,24 @@ export class CartComponent implements OnInit, OnDestroy {
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
     this.cargarDatosVacios(list.length);
     this.carrito = list;
-    this.cargarTotales();
+    this.cargarPrecios();
     await this.obtenerImagenes();
     this.spinner = false;
   }
 
-  private cargarTotales(): void {
-    this.total = 0;
+  private cargarPrecios(): void {
     for (let i = 0; i < this.carrito.length; i++) {
-      this.totales[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
-      this.total = this.twoDecimal(this.total + this.totales[i]);
+      this.precios[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
     }
+    this.cargarTotal();
+  }
+
+  private cargarTotal(): void {
+    let total = 0;
+    for (let i = 0; i < this.precios.length; i++) {
+      total = this.twoDecimal(total + this.precios[i]);
+    }
+    this.total = total;
   }
 
   private twoDecimal(value: any): number {
@@ -130,7 +138,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private async cargarDatosVacios(length: number): Promise<void> {
     this.imagenes = Array(length).fill("");
-    this.totales = Array(length).fill(0);
+    this.precios = Array(length).fill(0);
     this.cancelador$.next();
   }
 
