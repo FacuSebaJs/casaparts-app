@@ -25,7 +25,14 @@ export class SessionService {
         }
     }
 
-    getUser(): string | null {
+    setLoginData(data: { client: string, email: string, password: string, token: string }): void {
+        this.setCLient(data.client);
+        this.setEmail(data.email);
+        this.setPassword(data.password);
+        this.setToken(data.token);
+    }
+
+    getClient(): string | null {
         const user = localStorage.getItem('user');
         if (user) {
             return user;
@@ -36,16 +43,31 @@ export class SessionService {
         }
     }
 
-    setUser(user: string): void {
-        localStorage.setItem('user', user);
+    private setCLient(client: string): void {
+        localStorage.setItem('loginClient', client);
     }
 
+    getEmail(): string | null {
+        return localStorage.getItem('loginEmail');
+    }
+
+    private setEmail(email: string): void {
+        localStorage.setItem('loginEmail', email);
+    }
+
+    getPassword(): string | null {
+        return localStorage.getItem('loginPassword');
+    }
+
+    private setPassword(password: string): void {
+        localStorage.setItem('loginPassword', password);
+    }
 
     getToken(): string | null {
         return localStorage.getItem('token');
     }
 
-    setToken(token: string): void {
+    private setToken(token: string): void {
         localStorage.setItem('token', token);
     }
 

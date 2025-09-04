@@ -580,16 +580,55 @@ textarea {
 }
 
 .items .item {
-  height: 100px;
   min-height: 100px;
+  height: auto;
   align-items: stretch;
 }
 
 /* Fuerza que .meta y .price ocupen todo el alto disponible */
-.items .item > .meta,
-.items .item > .price {
+.items .item>.meta,
+.items .item>.price {
   align-self: stretch;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+@media (max-width: 400px) {
+  .items .item {
+    grid-template-columns: 56px 1fr;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .meta .name {
+    font-size: 13px;
+  }
+
+  .btn-qty {
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+  }
+
+  .qty input {
+    width: 48px;
+  }
+
+  .price .sub {
+    font-size: 15px;
+  }
+}
+
+.meta .name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

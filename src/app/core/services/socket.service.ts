@@ -81,7 +81,7 @@ export class SocketService {
     }
 
     connectRoom(): void {
-        const user = this._sessionService.getUser();
+        const user = this._sessionService.getClient();
         if (user) {
             this.socket.emit('connectRoom', user);
         }
@@ -104,7 +104,7 @@ export class SocketService {
     }
 
     changePedido(): void {
-        const user = this._sessionService.getUser();
+        const user = this._sessionService.getClient();
         if (user) {
             this.socket.emit('changePedido', user);
         }
@@ -143,7 +143,7 @@ export class SocketService {
     }
 
     changeConfig(config: any): void {
-        const user = this._sessionService.getUser();
+        const user = this._sessionService.getClient();
         if (user) {
             this.socket.emit('changeConfig', user, config);
         }
@@ -158,7 +158,7 @@ export class SocketService {
     }
 
     changeLocation(location: any): void {
-        const user = this._sessionService.getUser();
+        const user = this._sessionService.getClient();
         if (user) {
             this.socket.emit('changeLocation', user, location);
         }

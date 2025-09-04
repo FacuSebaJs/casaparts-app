@@ -46,7 +46,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async eliminar(index: number): Promise<void> {
-    const cliente = this._sessionService.getUser();
+    const cliente = this._sessionService.getClient();
     try {
       await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
       this.carrito.splice(index, 1);
@@ -80,7 +80,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private async cargaInicial(): Promise<void> {
     this.spinner = true;
-    const cliente = this._sessionService.getUser();
+    const cliente = this._sessionService.getClient();
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
     this.cargarDatosVacios(list.length);
     this.carrito = list;

@@ -1,2 +1,5 @@
+<!-- <app-menu-dropdown *ngIf="estaLogueado" class="mt-4"></app-menu-dropdown> -->
 <app-menu-dropdown *ngIf="estaLogueado"></app-menu-dropdown>
-<router-outlet></router-outlet>
+<div [ngStyle]="estaLogueado ? {'padding-top': '5px'} : {}">
+    <router-outlet></router-outlet>
+</div>

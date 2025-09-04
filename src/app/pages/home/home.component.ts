@@ -106,7 +106,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async cargaInicial(): Promise<void> {
-    this.cliente = this._sessionService.getUser();
+    this.cliente = this._sessionService.getClient();
     this.spinner = true;
     await this.cargarConfigCliente();
     await this.cargarnovedades();

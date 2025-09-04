@@ -27,7 +27,7 @@ export class MenuDropdownComponent implements OnInit {
     }
 
     async cargaInicial(): Promise<void> {
-        this.cliente = this._sessionService.getUser();
+        this.cliente = this._sessionService.getClient();
         await this.cargarCarrito();
         this.initSocket();
     }
@@ -55,6 +55,7 @@ export class MenuDropdownComponent implements OnInit {
 
     irAlCarrito(): void {
         if (this.articulosCarrito > 0) {
+            this.toggleMenu(true, false);
             this.router.navigate(['/order']);
         }
     }

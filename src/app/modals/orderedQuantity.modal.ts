@@ -35,7 +35,7 @@ export class OrderedQuantityModal implements OnInit {
     this.openModal
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
-        this.cliente = this._sessionService.getUser();
+        this.cliente = this._sessionService.getClient();
         this.buttonOpenModal.nativeElement.click();
         this.orderQuantity();
         fromEvent(document.getElementById('orderedQuantityModal')!, 'shown.bs.modal')
@@ -117,7 +117,7 @@ export class OrderedQuantityModal implements OnInit {
 
   private async orderQuantity(): Promise<void> {
     try {
-      const cliente = this._sessionService.getUser();
+      const cliente = this._sessionService.getClient();
       const response = await firstValueFrom(this._orderService.getBuy(cliente));
       this.cantidad = 0;
       if (this.art.QSTOCK == 'N' || this.art.QSTOCK == 'X') {

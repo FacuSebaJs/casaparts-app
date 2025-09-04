@@ -49,8 +49,8 @@
       </section>
     </aside>
   </div>
-  <footer class="sticky-footer" *ngIf="(carrito?.length ?? 0) > 0">
-    <div class="sf-total">Total: {{ 0 | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
+  <footer class="sticky-footer" *ngIf="(carrito && carrito.length) > 0">
+    <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
     <button class="btn-primary btn-ml" [disabled]="true">Confirmar pedido</button>
   </footer>
 </ng-template>
