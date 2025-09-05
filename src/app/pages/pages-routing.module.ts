@@ -23,6 +23,11 @@ const routes: Routes = [
     path: 'order',
     loadChildren: () => import('./order/order.module').then(m => m.OrderModule),
     canActivate: [sessionGuard]
+  },
+  {
+    path: 'orderHistory',
+    loadChildren: () => import('./orderHistory/orderHistory.module').then(m => m.OrderHistoryModule),
+    canActivate: [sessionGuard]
   }
 ];
 

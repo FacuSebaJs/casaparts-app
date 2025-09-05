@@ -6,17 +6,12 @@
 :root {
   --ml-yellow: #ffe600;
   --ml-blue: #3483fa;
-  --ml-text: #111827;
-  /* gris muy oscuro */
+  --ml-text: #111827;  
   --ml-muted: #6b7280;
-  /* gris medio para secundarios */
   --ml-line: #e6e8ec;
-  /* gris líneas/bordes */
   --ml-bg: #f7f8fa;
-  /* gris de fondo */
   --ml-white: #ffffff;
   --ml-danger: #e11d48;
-
   --ml-radius: 14px;
   --ml-shadow: 0 8px 22px rgba(2, 6, 23, .06);
   --ml-shadow-hover: 0 10px 28px rgba(2, 6, 23, .10);

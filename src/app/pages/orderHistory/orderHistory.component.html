@@ -1,0 +1,41 @@
+<h2 class="page-title">Pedidos Realizados</h2>
+<section *ngIf="orders && orders.length == 0; else hasItems" class="empty" [hidden]="spinner">
+    <p>No hay pedidos realizados.</p>
+</section>
+<ng-template #hasItems>
+    <div class="checkout" style="position: relative;">
+        <div *ngIf="spinner"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px; background-color: transparent;">
+            <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-black mt-2">Cargando pedidos...</p>
+        </div>
+        <section class="items" *ngIf="!spinner && orders" style="padding-top: 10px;">
+            <article class="order-card" *ngFor="let order of orders">
+                <div class="order-header">
+                    <div class="order-line">
+                        <div class="order-id">#{{ order.orden }}</div>
+                        <div class="order-qty">({{ order.cantidad }})</div>
+                        <span class="badge"
+                            [ngClass]="{'badge-pendiente': order.estado == 0,'badge-enviado': order.estado == 1,'badge-recibido': order.estado == 2}">
+                            {{ order.estado == 1 ? 'Enviado' : order.estado == 2 ? 'Recibido' : 'Pendiente' }}
+                        </span>
+                    </div>
+                    <button class="btn-secondary order-btn">Ver detalle</button>
+                </div>
+                <div class="order-body">
+                    <div>
+                        {{ order.fecha | date: 'dd/MM/yyyy' }} a las
+                        {{ order.fecha | date: 'HH:mm' }}hs
+                    </div>
+                    <div *ngIf="order.nota">Nota: {{ order.nota }}</div>
+                </div>
+            </article>
+        </section>
+    </div>
+    <div class="sticky-footer">
+        <button class="btn-primary">Todos los pedidos</button>
+        <button class="btn-primary">Refrescar</button>
+    </div>
+</ng-template>

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartItem } from '../../core/services/api/cart.service';
+import { OrderItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
 import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
@@ -9,13 +9,13 @@ import { SocketService } from '../../core/services/socket.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-cart',
+  selector: 'app-order',
   standalone: false,
-  templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css']
+  templateUrl: './order.component.html',
+  styleUrls: ['./order.component.css']
 })
-export class CartComponent implements OnInit, OnDestroy {
-  carrito: CartItem[] = [];
+export class OrderComponent implements OnInit, OnDestroy {
+  carrito: OrderItem[] = [];
   imagenes: string[] = [];
   precios: number[] = [];
   total: number = 0;

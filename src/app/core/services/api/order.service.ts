@@ -50,16 +50,8 @@ export class OrderService {
         const prepedido: boolean = false;
         const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/1/${prepedido}`;
         return this.http.get<any[]>(url).pipe(
-            switchMap(orderHeader => {
-                if (orderHeader && orderHeader.length) {
-                    return this.getOne(orderHeader[0].id).pipe(
-                        map((order: any) => {
-                            return order?.detalle || [];
-                        })
-                    );
-                } else {
-                    return of([]);
-                }
+            map((orders: any) => {
+                return orders || [];
             }),
             catchError(err => {
                 console.error('Error al obtener últimos pedidos', err);
@@ -70,7 +62,7 @@ export class OrderService {
 
     getAllOrders(cliente: any): Observable<any[]> {
         const prepedido: boolean = false;
-        const url = `${environment.API_URL}/pedido/getOrderHeader/${cliente}/0/${prepedido}`;
+        const url = `${environment.API_URL}/pedido/getOrderFilter/${cliente}`;
         return this.http.get<any[]>(url).pipe(
             switchMap(orderHeader => {
                 if (orderHeader && orderHeader.length) {
