@@ -36,6 +36,10 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
         // this.removeSockets();
     }
 
+    showDetail(id: number) {
+        this.router.navigate(['/orderDetail', id]);
+    }
+
     private async latestOrders(): Promise<void> {
         const cliente = this._sessionService.getClient();
         const orders = await firstValueFrom(this._orderService.getLatestOrders(cliente));

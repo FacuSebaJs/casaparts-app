@@ -22,7 +22,7 @@
                             {{ order.estado == 1 ? 'Enviado' : order.estado == 2 ? 'Recibido' : 'Pendiente' }}
                         </span>
                     </div>
-                    <button class="btn-secondary order-btn">Ver detalle</button>
+                    <button class="btn-secondary order-btn" (click)="showDetail(order.id)">Ver detalle</button>
                 </div>
                 <div class="order-body">
                     <div>

@@ -76,7 +76,7 @@ export class OrderComponent implements OnInit, OnDestroy {
   }
 
   volver(): void {
-    this.router.navigate(['/']);
+    window.history.back();
   }
 
   private async cargaInicial(): Promise<void> {

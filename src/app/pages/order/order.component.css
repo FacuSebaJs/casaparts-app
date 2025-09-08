@@ -1,8 +1,3 @@
-/* =======================
-   CasaParts · Checkout (look ML)
-   ======================= */
-
-/* ---- Design tokens ---- */
 :root {
   --ml-yellow: #ffe600;
   --ml-blue: #3483fa;
@@ -17,7 +12,6 @@
   --ml-shadow-hover: 0 10px 28px rgba(2, 6, 23, .10);
 }
 
-/* ---- Fondo con onda + tipografía base ---- */
 :host {
   display: block;
   min-height: 100dvh;
@@ -28,7 +22,6 @@
     repeating-linear-gradient(45deg, #fafafa 0 22px, #f4f5f7 22px 44px);
 }
 
-/* Barra amarilla arriba de todo (antes de todo el contenido) */
 :host::before {
   content: "";
   display: block;
@@ -49,36 +42,6 @@
   padding: 0 12px;
 }
 
-/* .page-title::after{
-  content:"";
-  display:block;
-  height: 4px; width: 78px;
-  background: var(--ml-yellow);
-  border-radius: 999px;
-  margin-top: 8px;
-  box-shadow: 0 4px 10px rgba(255,230,0,.35);
-} */
-
-/* ---- Layout principal ---- */
-.checkout {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  /* lista / resumen */
-  gap: 26px;
-  max-width: 1100px;
-  margin: 0 auto 90px;
-  /* espacio para footer mobile */
-  padding: 0 12px 24px;
-}
-
-@media (max-width: 992px) {
-  .checkout {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-}
-
-/* ---- Cards base ---- */
 .items .item,
 .card {
   background: var(--ml-white);
@@ -87,25 +50,11 @@
   box-shadow: var(--ml-shadow);
 }
 
-/* ---- Ítems del carrito ---- */
-.items .item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 84px 1fr 140px;
-  /* thumb / detalle / precios */
-  gap: 14px;
-  align-items: center;
-  padding: 14px;
-  margin-bottom: 12px;
-  transition: box-shadow .18s ease, transform .18s ease;
-}
-
 .items .item:hover {
   box-shadow: var(--ml-shadow-hover);
   transform: translateY(-1px);
 }
 
-/* barrita amarilla al pasar, detalle ML */
 .items .item::before {
   content: "";
   position: absolute;
@@ -122,29 +71,6 @@
   background: var(--ml-yellow);
 }
 
-@media (max-width: 520px) {
-  .items .item {
-    grid-template-columns: 64px 1fr;
-  }
-
-  .items .item .price {
-    grid-column: 1 / -1;
-    text-align: right;
-    padding-top: 6px;
-  }
-}
-
-/* Imagen/placeholder */
-.thumb {
-  width: 84px;
-  height: 84px;
-  object-fit: contain;
-  border: 1px solid var(--ml-line);
-  border-radius: 10px;
-  background: #fff;
-}
-
-/* Detalle del ítem */
 .meta .name {
   margin: 0 0 4px;
   font-size: 15px;
@@ -156,10 +82,8 @@
 .brand {
   color: var(--ml-muted);
   font-size: 12px;
-  margin-bottom: 8px;
 }
 
-/* Cantidades */
 .qty {
   display: flex;
   align-items: center;
@@ -191,14 +115,12 @@
   background: #fcfcfc;
 }
 
-/* quita spinners de <input type=number> */
 .qty input::-webkit-outer-spin-button,
 .qty input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* estándar + firefox */
 .qty input[type=number] {
   appearance: textfield;
   -moz-appearance: textfield;
@@ -221,7 +143,6 @@
   color: var(--ml-danger);
 }
 
-/* Precios */
 .price {
   text-align: right;
 }
@@ -236,7 +157,6 @@
   font-weight: 800;
 }
 
-/* ---- Columna resumen (sticky) ---- */
 .summary {
   position: sticky;
   top: 16px;
@@ -297,7 +217,6 @@ textarea {
   resize: vertical;
 }
 
-/* Totales */
 .totals .row {
   display: flex;
   justify-content: space-between;
@@ -317,7 +236,6 @@ textarea {
   margin-top: 4px;
 }
 
-/* ---- Botones ---- */
 .btn-primary {
   width: 100%;
   margin-top: 12px;
@@ -325,7 +243,7 @@ textarea {
   color: #fff;
   border: 0;
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 12px 16;
   font-weight: 800;
   letter-spacing: .2px;
   cursor: pointer;
@@ -355,7 +273,6 @@ textarea {
   font-weight: 700;
 }
 
-/* ---- Footer fijo mobile (CTA siempre visible) ---- */
 .sticky-footer {
   position: fixed;
   left: 0;
@@ -378,13 +295,6 @@ textarea {
   align-self: center;
 }
 
-@media (min-width: 992px) {
-  .sticky-footer {
-    display: none;
-  }
-}
-
-/* ---- Estado vacío ---- */
 .empty {
   background: var(--ml-white);
   border: 1px solid var(--ml-line);
@@ -395,16 +305,12 @@ textarea {
   margin: 0 auto;
 }
 
-/* ---- Accesibilidad: foco visible lindo ---- */
 *:focus-visible {
   outline: 2px solid var(--ml-blue);
   outline-offset: 2px;
   border-radius: 10px;
 }
 
-/* ====== MOBILE TUNING ====== */
-
-/* Teléfonos y phablets */
 @media (max-width: 768px) {
   .page-title {
     font-size: 22px;
@@ -413,17 +319,14 @@ textarea {
   }
 
   .checkout {
-    grid-template-columns: 1fr;
-    /* lista y resumen apilados */
+    grid-template-columns: 1fr;    
     gap: 12px;
     margin: 0 auto 80px;
-    padding: 0 10px 80px;
-    /* espacio para footer fijo */
+    padding: 0 10px 80px;    
   }
 
   .items .item {
-    grid-template-columns: 64px 1fr;
-    /* thumb + contenido */
+    grid-template-columns: 64px 1fr;    
     gap: 10px;
     padding: 10px;
     border-radius: 12px;
@@ -439,13 +342,10 @@ textarea {
     font-size: 14px;
     font-weight: 700;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    /* WebKit */
-    line-clamp: 2;
-    /* estándar */
+    -webkit-line-clamp: 2;    
+    line-clamp: 2;    
     -webkit-box-orient: vertical;
-    overflow: hidden;
-    /* evita que nombres largos desborden */
+    overflow: hidden;    
   }
 
   .brand {
@@ -475,8 +375,7 @@ textarea {
   .price .unit {
     display: none;
   }
-
-  /* oculto precio unitario para comprimir */
+  
   .price .sub {
     font-size: 16px;
   }
@@ -484,8 +383,7 @@ textarea {
   .summary {
     position: static;
   }
-
-  /* quita sticky en mobile para evitar saltos */
+  
   .card {
     padding: 12px;
   }
@@ -512,7 +410,6 @@ textarea {
   }
 }
 
-/* Teléfonos chicos (360px y menos) */
 @media (max-width: 400px) {
   .page-title {
     font-size: 20px;
@@ -521,7 +418,7 @@ textarea {
   .items .item {
     grid-template-columns: 56px 1fr;
     gap: 8px;
-    padding: 8px;
+    padding: 0;
   }
 
   .thumb {
@@ -548,12 +445,10 @@ textarea {
   }
 }
 
-/* Footer fijo: respeta “notch” en iOS */
 .sticky-footer {
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
-/* Botón ML: fondo amarillo + texto negro */
 .btn-ml {
   background: var(--ml-yellow) !important;
   color: #111 !important;
@@ -567,8 +462,7 @@ textarea {
 }
 
 .btn-ml:disabled {
-  opacity: .85;
-  /* que siga legible */
+  opacity: .85;  
   cursor: not-allowed;
   color: #111 !important;
   box-shadow: none;
@@ -578,9 +472,9 @@ textarea {
   min-height: 100px;
   height: auto;
   align-items: stretch;
+  padding: 0;
 }
 
-/* Fuerza que .meta y .price ocupen todo el alto disponible */
 .items .item>.meta,
 .items .item>.price {
   align-self: stretch;
@@ -593,7 +487,7 @@ textarea {
   .items .item {
     grid-template-columns: 56px 1fr;
     gap: 8px;
-    padding: 8px;
+    padding: 0;
   }
 
   .thumb {
@@ -618,6 +512,69 @@ textarea {
   .price .sub {
     font-size: 15px;
   }
+}
+
+.meta .name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.checkout {
+  display: grid;
+  grid-template-columns: 1fr 360px; /* Esta es la misma configuración que en el primer bloque */
+  gap: 26px;
+  max-width: 1100px;
+  margin: 0 auto 90px;
+  padding: 0 12px 24px;
+}
+
+@media (max-width: 992px) {
+  .checkout {
+    grid-template-columns: 1fr; /* En pantallas más pequeñas, una sola columna */
+    gap: 16px;
+  }
+}
+
+.items .item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 84px 1fr 140px; /* Asegura que esta sea igual a la del primer bloque */
+  gap: 14px;
+  align-items: center;
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+
+@media (max-width: 520px) {
+  .items .item {
+    grid-template-columns: 64px 1fr; /* Mantén las mismas proporciones para pantallas más pequeñas */
+  }
+}
+
+.thumb {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  border: 1px solid var(--ml-line);
+  border-radius: 10px;
+  
+}
+
+@media (max-width: 520px) {
+  .thumb {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.meta .name {
+  margin: 0 0 4px;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ml-text);
 }
 
 .meta .name {

@@ -121,7 +121,7 @@ export class OrderService {
         );
     }
 
-    private getOne(id: number): Observable<any> {
+    getOne(id: number): Observable<any> {
         let url: string = `${environment.API_URL}/pedido/getOne/${id}`;
         return this.http.get<any>(url, { responseType: 'json' }).pipe(
             map((order: any) => {
