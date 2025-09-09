@@ -1,7 +1,7 @@
 :host {
     display: block;
     min-height: 100dvh;
-    color: var(--ml-text);
+    color: var#111827;
     background:
         radial-gradient(900px 500px at -10% -20%, rgba(255, 230, 0, .15), transparent 60%),
         radial-gradient(700px 480px at 110% 120%, rgba(255, 230, 0, .10), transparent 60%),
@@ -45,10 +45,10 @@
 
 .items .item,
 .card {
-    background: var(--ml-white);
-    border: 1px solid var(--ml-line);
-    border-radius: var(--ml-radius);
-    box-shadow: var(--ml-shadow);
+    background: var#ffffff;
+    border: 1px solid var#e6e8ec;
+    border-radius: var14px;
+    box-shadow: var0 8px 22px rgba(2, 6, 23, .06);
 }
 
 .items .item {
@@ -61,7 +61,7 @@
 }
 
 .items .item:hover {
-    box-shadow: var(--ml-shadow-hover);
+    box-shadow: var0 10px 28px rgba(2, 6, 23, .10);
     transform: translateY(-1px);
 }
 
@@ -78,7 +78,7 @@
 }
 
 .items .item:hover::before {
-    background: var(--ml-yellow);
+    background: var#ffe600;
 }
 
 @media (max-width: 520px) {
@@ -97,7 +97,7 @@
     width: 84px;
     height: 84px;
     object-fit: contain;
-    border: 1px solid var(--ml-line);
+    border: 1px solid var#e6e8ec;
     border-radius: 10px;
     background: #fff;
 }
@@ -107,11 +107,11 @@
     font-size: 15px;
     line-height: 1.25;
     font-weight: 700;
-    color: var(--ml-text);
+    color: var#111827;
 }
 
 .brand {
-    color: var(--ml-muted);
+    color: var#6b7280;
     font-size: 12px;
     margin-bottom: 8px;
 }
@@ -127,8 +127,8 @@
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    border: 1px solid var(--ml-line);
-    background: var(--ml-white);
+    border: 1px solid var#e6e8ec;
+    background: var#ffffff;
     cursor: pointer;
     font-size: 16px;
     line-height: 1;
@@ -142,7 +142,7 @@
 .qty input {
     width: 68px;
     padding: 8px 10px;
-    border: 1px solid var(--ml-line);
+    border: 1px solid var#e6e8ec;
     border-radius: 8px;
     background: #fcfcfc;
 }
@@ -161,7 +161,7 @@
 .btn-link {
     background: transparent;
     border: 0;
-    color: var(--ml-blue);
+    color: #3483fa;
     cursor: pointer;
     font-size: 13px;
     text-decoration: none;
@@ -172,7 +172,7 @@
 }
 
 .btn-link.danger {
-    color: var(--ml-danger);
+    color: var#e11d48;
 }
 
 .price {
@@ -180,7 +180,7 @@
 }
 
 .price .unit {
-    color: var(--ml-muted);
+    color: var#6b7280;
     font-size: 12px;
 }
 
@@ -217,7 +217,7 @@
 }
 
 .radio input {
-    accent-color: var(--ml-blue);
+    accent-color: #3483fa;
 }
 
 .address {
@@ -228,13 +228,13 @@
 
 .address input {
     padding: 10px 12px;
-    border: 1px solid var(--ml-line);
+    border: 1px solid var#e6e8ec;
     border-radius: 10px;
     background: #fcfcfc;
 }
 
 .hint {
-    color: var(--ml-muted);
+    color: var#6b7280;
     font-size: 12px;
     margin-top: 2px;
 }
@@ -243,7 +243,7 @@ textarea {
     width: 100%;
     margin-top: 8px;
     padding: 10px 12px;
-    border: 1px solid var(--ml-line);
+    border: 1px solid var#e6e8ec;
     border-radius: 10px;
     background: #fcfcfc;
     resize: vertical;
@@ -258,7 +258,7 @@ textarea {
 }
 
 .totals .row:not(:last-child) {
-    border-bottom: 1px dashed var(--ml-line);
+    border-bottom: 1px dashed var#e6e8ec;
     padding-bottom: 8px;
 }
 
@@ -271,7 +271,7 @@ textarea {
 .btn-primary {
     width: 100%;
     margin-top: 12px;
-    background: var(--ml-blue);
+    background: #3483fa;
     color: #fff;
     border: 0;
     border-radius: 10px;
@@ -306,17 +306,17 @@ textarea {
 }
 
 .empty {
-    background: var(--ml-white);
-    border: 1px solid var(--ml-line);
-    border-radius: var(--ml-radius);
-    box-shadow: var(--ml-shadow);
+    background: var#ffffff;
+    border: 1px solid var#e6e8ec;
+    border-radius: var14px;
+    box-shadow: var0 8px 22px rgba(2, 6, 23, .06);
     padding: 16px;
     max-width: 1100px;
     margin: 0 auto;
 }
 
 *:focus-visible {
-    outline: 2px solid var(--ml-blue);
+    outline: 2px solid #3483fa;
     outline-offset: 2px;
     border-radius: 10px;
 }
@@ -452,7 +452,7 @@ textarea {
 }
 
 .btn-ml {
-    background: var(--ml-yellow) !important;
+    background: var#ffe600 !important;
     color: #111 !important;
     box-shadow: 0 6px 16px rgba(255, 230, 0, .35);
 }
@@ -580,7 +580,7 @@ textarea {
   gap: 3px;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(4px);
-  border-top: 1px solid var(--ml-line);
+  border-top: 1px solid var#e6e8ec;
   padding: 3px 5px;
   box-shadow: 0 -3px 8px rgba(2, 6, 23, 0.06);
   border-radius: 10px 10px 0 0;
@@ -591,7 +591,7 @@ textarea {
   width: 100%;
   padding: 6px 0;
   font-size: 16px;
-  background-color: var(--button-bg-color, #007bff);
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
@@ -599,7 +599,7 @@ textarea {
 }
 
 .sticky-footer button:disabled {
-  background-color: #b0b0b0;
+  /* background-color: #b0b0b0; */
   cursor: not-allowed;
 }
 
