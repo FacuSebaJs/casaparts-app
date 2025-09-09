@@ -24,7 +24,7 @@
                         <div class="order-id">{{ it.articulo.MARCA }}</div>
                         <div class="order-id"> • {{ it.articulo.CODIGO }}</div>
                         <div class="order-qty">({{ it.cantidad }})</div>
-                        <span class="badge"
+                        <span class="badge" style="align-self: center;"
                             [ngClass]="{'badge-enviado': !it.fecha_recibido,'badge-recibido': it.fecha_recibido}">
                             {{ it.fecha_recibido ? 'Recibido' : 'Enviado'}}
                         </span>
@@ -33,7 +33,7 @@
             </article>
         </section>
     </div>
-    <footer class="sticky-footer" *ngIf="(order && order.detalle.length) > 0">        
+    <footer class="sticky-footer" *ngIf="(order && order.detalle.length) > 0">
         <button class="btn-primary btn-ml" [disabled]="true">Imprimir pedido</button>
         <button class="btn-primary btn-ml" [disabled]="true">Marcar todo</button>
     </footer>
