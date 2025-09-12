@@ -10,9 +10,14 @@ export const environment = {
     // IMAGES_URL: 'https://test-listas.casadelrenault.com/orders',
     // SOCKET_URL: 'https://test-casaparts.casadelrenault.com',
     // SOCKET_PATH: '/socket.io'
-    API_URL: 'https://casaparts.casadelrenault.com/backend',
-    AUTH_URL: 'https://casaparts.casadelrenault.com/auth',
+    // API_URL: 'https://casaparts.casadelrenault.com/backend',
+    // AUTH_URL: 'https://casaparts.casadelrenault.com/auth',
+    // IMAGES_URL: 'https://listas.casadelrenault.com/orders',
+    // SOCKET_URL: 'https://casaparts.casadelrenault.com',
+    // SOCKET_PATH: '/socket.io'
+    API_URL: 'https://mobile.joinlabs.com.ar/back',
+    AUTH_URL: 'https://mobile.joinlabs.com.ar/auth',
     IMAGES_URL: 'https://listas.casadelrenault.com/orders',
-    SOCKET_URL: 'https://casaparts.casadelrenault.com',
-    SOCKET_PATH: '/socket.io'
+    SOCKET_URL: 'https://mobile.joinlabs.com.ar',
+    SOCKET_PATH: ''
 }
