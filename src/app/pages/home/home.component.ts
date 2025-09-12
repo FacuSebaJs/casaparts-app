@@ -254,7 +254,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private initSocket(): void {
-    this._socketService.connect();
     if (this.obsSocConnect) {
       this.obsSocConnect.unsubscribe();
     }
@@ -299,6 +298,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         await this.refreshIcon();
         return null;
       })
+    this._socketService.connect();
   }
 
   removeSockets(): void {

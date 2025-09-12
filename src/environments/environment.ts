@@ -19,5 +19,5 @@ export const environment = {
     AUTH_URL: 'https://mobile.joinlabs.com.ar/auth',
     IMAGES_URL: 'https://listas.casadelrenault.com/orders',
     SOCKET_URL: 'https://mobile.joinlabs.com.ar',
-    SOCKET_PATH: ''
+    SOCKET_PATH: '/socket.io'
 }

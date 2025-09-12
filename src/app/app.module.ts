@@ -21,11 +21,10 @@ const socketConfig: SocketIoConfig = {
         autoConnect: false,
         path: environment.SOCKET_PATH,
         transports: [
+            
             'flashsocket',
             'htmlfile',
-            'xhr-polling',
-            'jsonp-polling',
-            'polling',
+            'websocket',
             'ws',
             'wss'
         ]
