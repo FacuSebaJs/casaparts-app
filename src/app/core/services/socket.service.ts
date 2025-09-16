@@ -14,16 +14,24 @@ export class SocketService {
         private readonly socket: Socket,
         private readonly _sessionService: SessionService
     ) {
-        this.socketStatus = true;
+        this.socketStatus = false;
         this.status = new Subject<Date>();
         this.lastChange = '';
     }
 
     connect(): void {
         if (!this.socketStatus) {
-            this.socket.connect();
-            this.socketStatus = true;
-            this.status.next(new Date());
+            const socket = this.socket.connect();
+            if (socket.connected) {
+                this.socketStatus = true;
+                this.status.next(new Date());
+            }
+            else {
+                console.warn("No se pudo conectar al socket");
+            }
+        }
+        else {
+            console.warn("Socket ya conectado");
         }
     }
 
@@ -54,19 +62,19 @@ export class SocketService {
         this.socket.removeAllListeners();
         return new Observable<any>((observer) => {
             this.socket.on('connected', (message) => {
-                observer.next(message);
+                observer.next('message');
                 this.socketStatus = true;
                 this.lastChange = "connected";
                 this.changeDetected();
             });
             this.socket.on("disconnect", (reason) => {
-                console.log("disconnect:", reason);
+                console.log("socket disconnect:", reason);
                 this.socketStatus = false;
                 this.lastChange = "disconnect";
                 this.changeDetected();
             });
             this.socket.on("reconnect", () => {
-                console.log("reconnect:");
+                console.log("socket reconnect");
                 this.socketStatus = true;
                 this.lastChange = "reconnect";
                 this.changeDetected();

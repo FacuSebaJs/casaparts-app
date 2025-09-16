@@ -7,6 +7,7 @@ import { SessionService } from '../../core/services/session.service';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { SocketService } from '../../core/services/socket.service';
 import { ToastrService } from 'ngx-toastr';
+import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 
 @Component({
   selector: 'app-cart',
@@ -23,8 +24,9 @@ export class CartComponent implements OnInit, OnDestroy {
   cancelador$ = new Subject<void>();
   obsChangedOrderDetail = new Subscription();
   unsubscribe$ = new Subject<void>();
+  configCliente = { general: null, contado: null, tarjeta: null, descuento: null };
 
-  constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService) {
+  constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService, private _configClienteService: ConfigClienteService) {
   }
 
   trackByIndex(i: number): number {
@@ -79,9 +81,21 @@ export class CartComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
+  async cargarConfigCliente(): Promise<void> {
+    try {
+      const cliente = this._sessionService.getClient();
+      const configCliente = await firstValueFrom(this._configClienteService.getConfig(Number(cliente)));
+      this.configCliente = configCliente;
+    } catch (err) {
+      console.error('Error cargando configuración de cliente', err);
+      throw err;
+    }
+  }
+
   private async cargaInicial(): Promise<void> {
     this.spinner = true;
     const cliente = this._sessionService.getClient();
+    await this.cargarConfigCliente();
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
     this.cargarDatosVacios(list.length);
     this.carrito = list;
@@ -93,6 +107,11 @@ export class CartComponent implements OnInit, OnDestroy {
   private cargarPrecios(): void {
     for (let i = 0; i < this.carrito.length; i++) {
       this.precios[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
+      const descuento: number = this.configCliente.descuento || 0;
+      let total: number = this.twoDecimal((Number(this.carrito[i].articulo.PRECIO) - this.twoDecimal(Number(this.carrito[i].articulo.PRECIO) * descuento / 100)) * this.carrito[i].cantidad);
+      if (this.carrito[i].articulo.DTO) {
+        total = this.twoDecimal(total - this.twoDecimal((total * this.carrito[i].articulo.DTO / 100)));
+      }
     }
     this.cargarTotal();
   }

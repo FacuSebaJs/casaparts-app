@@ -7,13 +7,13 @@ export class SessionService {
 
     constructor(private _router: Router) { }
 
-    async checkSession(response: Partial<HttpResponse<any>>): Promise<any> {
+    checkSession(response: Partial<HttpResponse<any>>): any {
         try {
             if (response.status == 401) {
-                let message: string = 'Debe logearse para poder usar la aplicación';
+                let message: string = 'Debe estar logueado para poder usar la aplicación';
                 localStorage.removeItem('token');
-                await this._router.navigate(['auth']);
                 console.log(message, 'Sesión caducada');
+                this._router.navigate(['auth']);
                 return null;
             }
             else {
@@ -33,7 +33,7 @@ export class SessionService {
     }
 
     getClient(): string | null {
-        const user = localStorage.getItem('user');
+        const user = localStorage.getItem('loginClient');
         if (user) {
             return user;
         }
