@@ -1,24 +1,29 @@
 <div class="dropdown"
-  style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 5px; border-radius: 8px; cursor: pointer;">
+  style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding-top: 5px; border-radius: 8px; cursor: pointer;">
   <button class="btn btn-outline-secondary" type="button" id="dropdownMenuButton" aria-expanded="false"
     (click)="toggleMenu(false)">
     <i class="bi bi-list" style="font-size: 1.5rem;"></i>
   </button>
-  <ul class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton" style="min-width: auto;">
+  <ul class="dropdown-menu dropdown-menu-end p-2 custom-dropdown-menu" aria-labelledby="dropdownMenuButton" style="min-width: auto;">
     <li>
       <a class="dropdown-item p-1" (click)="irAlCarrito()">
         <div style="position: relative; display: inline-block;">
-          <img src="assets/images/CarritoCompras.png" alt="Carrito" width="36" height="36"
-            style="background-color: transparent;" />
+          <img src="assets/images/CarritoCompras.png" alt="Carrito" class="icon-img" />
           <span *ngIf="articulosCarrito > 0"
-            style="position: absolute; top: -6px; right: -6px; background-color: red; color: white; border-radius: 999px; padding: 2px 6px; font-size: 12px; line-height: 1; min-width: 18px; text-align: center; display: inline-block; ">
-            {{ (articulosCarrito>99) ? '99+' : articulosCarrito}} </span>
+            class="badge">
+            {{ (articulosCarrito>99) ? '99+' : articulosCarrito}}
+          </span>
         </div>
       </a>
     </li>
     <li>
+      <a class="dropdown-item p-1" (click)="irAlHistorial()">
+        <i class="bi bi-cart-check icon" style="font-size: xx-large"></i>
+      </a>
+    </li>
+    <li class="horizontal-line">
       <a class="dropdown-item p-1" (click)="logout()">
-        <i style="font-size: xx-large; color: #6D6F71;" class="material-icons">logout</i>
+        <i class="material-icons icon" style="height: 100%; font-size: 32px;">logout</i>
       </a>
     </li>
   </ul>

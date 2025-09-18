@@ -6,7 +6,7 @@
 <ng-template #hasItems>
   <div class="checkout" style="position: relative;">
     <div *ngIf="spinner"
-      style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px; background-color: transparent;">
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px; background-color: transparent;">
       <div class="spinner-border text-dark" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
@@ -14,15 +14,13 @@
     </div>
     <section class="items" *ngIf="!spinner && carrito">
       <article class="item" *ngFor="let it of carrito; let i = index; trackBy: trackByIndex">
-        <img class="thumb" *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
-          alt="Sin foto" style="width: 100%; height: 100%;" />
-        <img class="thumb" *ngIf="imagenes[i]!=null && imagenes[i]!=''" [src]="imagenes[i]" class="d-block mx-auto"
-          alt="" style="width: 100%; height: 100%; background-color: transparent;" />
+        <img class="thumb" *ngIf="imagenes[i]==null" src="assets/images/not_found.png" alt="Sin foto" />
+        <img class="thumb" *ngIf="imagenes[i] && imagenes[i] != ''" [src]="imagenes[i]" alt="Imagen producto" />
         <div class="meta">
           <h3 class="name">{{ it.articulo.DESCRIP || '—' }}</h3>
           <div class="brand" *ngIf="it.articulo.MARCA && it.articulo.CODIGO">
             <span>{{ it.articulo.MARCA }}</span>
-            <span>• {{ it.articulo.CODIGO }}</span>
+            <span> • {{ it.articulo.CODIGO }}</span>
           </div>
           <div class="qty">
             <span> Cantidad: <strong>{{ it.cantidad }}</strong> </span>
@@ -31,23 +29,11 @@
         </div>
         <div class="price">
           <div class="sub">
-            {{ totales[i] | currency:'ARS':'symbol-narrow':'1.2-2' }}
+            {{ precios[i] | currency:'ARS':'symbol-narrow':'1.2-2' }}
           </div>
         </div>
       </article>
     </section>
-    <aside class="summary" *ngIf="!spinner && carrito">
-      <section class="card totals">
-        <div class="row">
-          <span>Total</span>
-          <span class="total">{{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
-        </div>
-        <button class="btn-primary btn-ml" [disabled]="!canProceed" (click)="confirmar()">
-          Confirmar pedido
-        </button>
-        <button class="btn-link" (click)="volver()">Volver</button>
-      </section>
-    </aside>
   </div>
   <footer class="sticky-footer" *ngIf="(carrito && carrito.length) > 0">
     <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>

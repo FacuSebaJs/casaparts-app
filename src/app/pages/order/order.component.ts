@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartItem } from '../../core/services/api/cart.service';
+import { OrderItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
 import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
@@ -10,15 +10,15 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 
 @Component({
-  selector: 'app-cart',
+  selector: 'app-order',
   standalone: false,
-  templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css']
+  templateUrl: './order.component.html',
+  styleUrls: ['./order.component.css']
 })
-export class CartComponent implements OnInit, OnDestroy {
-  carrito: CartItem[] = [];
+export class OrderComponent implements OnInit, OnDestroy {
+  carrito: OrderItem[] = [];
   imagenes: string[] = [];
-  totales: number[] = [];
+  precios: number[] = [];
   total: number = 0;
   spinner: boolean = false;
   cancelador$ = new Subject<void>();
@@ -52,8 +52,9 @@ export class CartComponent implements OnInit, OnDestroy {
     try {
       await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
       this.carrito.splice(index, 1);
-      this.totales.splice(index, 1);
+      this.precios.splice(index, 1);
       this.imagenes.splice(index, 1);
+      this.cargarTotal();
     }
     catch (err) {
       console.error('Error al eliminar artículo', err);
@@ -77,7 +78,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   volver(): void {
-    this.router.navigate(['/']);
+    window.history.back();
   }
 
   async cargarConfigCliente(): Promise<void> {
@@ -98,22 +99,29 @@ export class CartComponent implements OnInit, OnDestroy {
     const list = await firstValueFrom(this._orderService.getBuy(cliente)) || [];
     this.cargarDatosVacios(list.length);
     this.carrito = list;
-    this.cargarTotales();
+    this.cargarPrecios();
     await this.obtenerImagenes();
     this.spinner = false;
   }
 
-  private cargarTotales(): void {
-    this.total = 0;
+  private cargarPrecios(): void {
     for (let i = 0; i < this.carrito.length; i++) {
       const descuento: number = this.configCliente.descuento || 0;
       let total: number = this.twoDecimal((Number(this.carrito[i].articulo.PRECIO) - this.twoDecimal(Number(this.carrito[i].articulo.PRECIO) * descuento / 100)) * this.carrito[i].cantidad);
       if (this.carrito[i].articulo.DTO) {
         total = this.twoDecimal(total - this.twoDecimal((total * this.carrito[i].articulo.DTO / 100)));
       }
-      this.totales[i] = total;
-      this.total = this.twoDecimal(this.total + this.totales[i]);
+      this.precios[i] = total;
     }
+    this.cargarTotal();
+  }
+
+  private cargarTotal(): void {
+    let total = 0;
+    for (let i = 0; i < this.precios.length; i++) {
+      total = this.twoDecimal(total + this.precios[i]);
+    }
+    this.total = total;
   }
 
   private twoDecimal(value: any): number {
@@ -149,7 +157,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private async cargarDatosVacios(length: number): Promise<void> {
     this.imagenes = Array(length).fill("");
-    this.totales = Array(length).fill(0);
+    this.precios = Array(length).fill(0);
     this.cancelador$.next();
   }
 
