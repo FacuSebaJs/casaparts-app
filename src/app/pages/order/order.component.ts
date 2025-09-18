@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartItem } from '../../core/services/api/cart.service';
+import { OrderItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
 import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
@@ -10,13 +10,13 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 
 @Component({
-  selector: 'app-cart',
+  selector: 'app-order',
   standalone: false,
-  templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css']
+  templateUrl: './order.component.html',
+  styleUrls: ['./order.component.css']
 })
-export class CartComponent implements OnInit, OnDestroy {
-  carrito: CartItem[] = [];
+export class OrderComponent implements OnInit, OnDestroy {
+  carrito: OrderItem[] = [];
   imagenes: string[] = [];
   precios: number[] = [];
   total: number = 0;
@@ -78,7 +78,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   volver(): void {
-    this.router.navigate(['/']);
+    window.history.back();
   }
 
   async cargarConfigCliente(): Promise<void> {
@@ -106,12 +106,12 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private cargarPrecios(): void {
     for (let i = 0; i < this.carrito.length; i++) {
-      this.precios[i] = this.twoDecimal(this.twoDecimal(this.carrito[i].COSTO) * this.twoDecimal(this.carrito[i].cantidad));
       const descuento: number = this.configCliente.descuento || 0;
       let total: number = this.twoDecimal((Number(this.carrito[i].articulo.PRECIO) - this.twoDecimal(Number(this.carrito[i].articulo.PRECIO) * descuento / 100)) * this.carrito[i].cantidad);
       if (this.carrito[i].articulo.DTO) {
         total = this.twoDecimal(total - this.twoDecimal((total * this.carrito[i].articulo.DTO / 100)));
       }
+      this.precios[i] = total;
     }
     this.cargarTotal();
   }

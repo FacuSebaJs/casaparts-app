@@ -59,6 +59,10 @@ export class MenuDropdownComponent implements OnInit {
             this.router.navigate(['/order']);
         }
     }
+    irAlHistorial() {
+        this.toggleMenu(true, false);
+        this.router.navigate(['/orderHistory']);
+    }
 
     logout(): void {
         this._socketService.disconnect();

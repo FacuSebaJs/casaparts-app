@@ -1,0 +1,40 @@
+<h2 class="page-title">Detalle del Pedido</h2>
+<section *ngIf="order && order.detalle.length == 0; else hasItems" class="empty" [hidden]="spinner">
+    <p>No hay productos en el carrito.</p>
+    <button class="btn-secondary" (click)="volver()">Volver</button>
+</section>
+<ng-template #hasItems>
+    <div class="checkout" style="position: relative;">
+        <div *ngIf="spinner"
+            style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px); z-index: 10; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px; background-color: transparent;">
+            <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-black mt-2">Cargando pedido...</p>
+        </div>
+        <section class="items" *ngIf="!spinner && order">
+            <article class="item" *ngFor="let it of order.detalle; let i = index; trackBy: trackByIndex">
+                <img class="thumb" *ngIf="imagenes[i]==null" src="assets/images/not_found.png" class="d-block mx-auto"
+                    alt="Sin foto" style="width: 100%; height: 100%;" />
+                <img class="thumb" *ngIf="imagenes[i]!=null && imagenes[i]!=''" [src]="imagenes[i]"
+                    class="d-block mx-auto" alt="" style="width: 100%; height: 100%; background-color: transparent;" />
+                <div class="meta">
+                    <h3 class="name">{{ it.articulo.DESCRIP || '—' }}</h3>
+                    <div class="order-line">
+                        <div class="order-id">{{ it.articulo.MARCA }}</div>
+                        <div class="order-id"> • {{ it.articulo.CODIGO }}</div>
+                        <div class="order-qty">({{ it.cantidad }})</div>
+                        <span class="badge" style="align-self: center;"
+                            [ngClass]="{'badge-enviado': !it.fecha_recibido,'badge-recibido': it.fecha_recibido}">
+                            {{ it.fecha_recibido ? 'Recibido' : 'Enviado'}}
+                        </span>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </div>
+    <!-- <footer class="sticky-footer" *ngIf="(order && order.detalle.length) > 0">
+        <button class="btn-primary btn-ml" [disabled]="true">Imprimir pedido</button>
+        <button class="btn-primary btn-ml" [disabled]="true">Marcar todo</button>
+    </footer> -->
+</ng-template>

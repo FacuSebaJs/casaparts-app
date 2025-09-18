@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CartComponent } from './cart.component';
+import { OrderComponent } from './order.component';
 
 const routes: Routes = [
-  { path: '', component: CartComponent },
+  { path: '', component: OrderComponent },
   { path: '**', redirectTo: '' }
 ];
 
