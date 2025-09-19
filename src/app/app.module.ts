@@ -3,7 +3,7 @@ import { registerLocaleData } from '@angular/common';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
@@ -15,13 +15,14 @@ import localeEs from '@angular/common/locales/es-AR';
 registerLocaleData(localeEs, 'es-AR');
 import { GlobalConfig, ToastrModule } from 'ngx-toastr';
 import { MenuDropdownModule } from './pages/menu/menu-dropdown.module';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 const socketConfig: SocketIoConfig = {
     url: environment.SOCKET_URL, options: {
         autoConnect: false,
         path: environment.SOCKET_PATH,
         transports: [
-            
+
             'flashsocket',
             'htmlfile',
             'websocket',
@@ -60,7 +61,12 @@ const toastConfig: Partial<GlobalConfig> = {
     providers: [
         { provide: LOCALE_ID, useValue: 'es-AR' },
         provideHttpClient(withInterceptorsFromDi()),
-        SocketService
+        SocketService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
+        }
     ],
     bootstrap: [AppComponent],
     exports: [ToastrModule]

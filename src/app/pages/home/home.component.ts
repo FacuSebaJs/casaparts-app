@@ -8,6 +8,9 @@ import { OrderService } from '../../core/services/api/order.service';
 import { SessionService } from '../../core/services/session.service';
 import { ToastrService } from 'ngx-toastr';
 import { Carousel } from 'bootstrap';
+import { ConfigClient } from '../../models/configClient.model';
+import { ImageFormats } from '../../models/image.model';
+import { ArticleItem } from '../../models/articulo.model';
 
 
 @Component({
@@ -21,11 +24,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   carouselInstance?: Carousel;
   cargandoProductos: boolean = false;
   errorProductos: string = '';
-  articulos: any[] = [];
+  articulos: ArticleItem[] = [];
   busqueda: string = '';
   imagenes: any[] = [];
   spinner: boolean = false;
-  configCliente = { general: null, contado: null, tarjeta: null, descuento: null };
+  configCliente: ConfigClient = { general: null, contado: null, tarjeta: null, descuento: null };
   precios: any[] = [];
   indexImagen: number = 0;
   cancelador$ = new Subject<void>();
@@ -115,7 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.initSocket();
   }
 
-  agregarAlCarrito(item: any): void {
+  agregarAlCarrito(item: ArticleItem): void {
     this.pausarCarrusel();
     this.selectedArt = item;
     this.openModalOrderedQuantity.next();
@@ -152,7 +155,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  async obtenerImagen(index: number) {
+  async obtenerImagen(index: number): Promise<ImageFormats | null> {
     try {
       const imagenes = await firstValueFrom(this._articuloService.getUrlImages(this.articulos[index].CODIGO)
         .pipe(takeUntil(this.cancelador$)));
@@ -189,6 +192,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       this.imagenes[this.indexImagen] = '';
       const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(this.cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
+      console.log("ARTS:", articulos);
       this.articulos = articulos;
       await this.refreshIcon();
       await this.actualizarDatos(0);

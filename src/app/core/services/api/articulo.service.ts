@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
+import { ImageFormats } from '../../../models/image.model';
 
 @Injectable()
 export class ArticuloService {
@@ -10,10 +11,8 @@ export class ArticuloService {
 
     getNov(cliente: any): Observable<any[]> {
         let url: string = `${environment.API_URL}/busqueda/nov-off/${cliente}`;
-
         return this.http.get<any>(url, { responseType: 'json' }).pipe(
             map(articulos => {
-
                 return articulos;
             }),
             catchError(err => {
@@ -23,9 +22,9 @@ export class ArticuloService {
         );
     }
 
-    getUrlImages(codigo: string): Observable<any[]> {
+    getUrlImages(codigo: string): Observable<ImageFormats[]> {
         let url: string = `${environment.IMAGES_URL}/getFormatImgArticulo/${codigo}`;
-        return this.http.get<any[]>(url, { responseType: 'json' }).pipe(
+        return this.http.get<ImageFormats[]>(url, { responseType: 'json' }).pipe(
             map(images => {
                 return images;
             }),

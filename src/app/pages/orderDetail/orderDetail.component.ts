@@ -1,8 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
-import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { SocketService } from '../../core/services/socket.service';
@@ -14,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './orderDetail.component.html',
     styleUrls: ['./orderDetail.component.css']
 })
-export class OrderDetailComponent implements OnInit, OnDestroy {
+export class OrderDetailComponent implements OnInit {
 
     orderId?: number;
     spinner: boolean = false;
@@ -39,12 +38,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
                 this.redirect();
             }
         });
-    }
-
-
-    ngOnDestroy(): void {
-        // this.removeListener();
-        // this.removeSockets();
     }
 
     redirect() {

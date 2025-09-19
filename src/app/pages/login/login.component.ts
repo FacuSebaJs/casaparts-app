@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SocketService } from '../../core/services/socket.service';
 import { SessionService } from '../../core/services/session.service';
 import { PwaService } from '../../core/services/pwa.service';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -43,32 +43,32 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.showInstallButton = false;
   }
 
-  ingresar(): void {
-    if (this.client && this.email && this.password) {
-      this._authService.login(this.getClient(), this.email, this.password).subscribe({
-        next: (response: any) => {
-          if (response.acceso_permitido == true) {
-            this._sessionService.setLoginData({
-              client: this.getClient().toString(),
-              email: this.email,
-              password: this.password,
-              token: response.token ? response.token : 'development'
-            })
-            this.router.navigate(['/home']);
+  async ingresar(): Promise<void> {
+    try {
+      if (this.client && this.email && this.password) {
+        const respLogin = await firstValueFrom(this._authService.login(this.getClient(), this.email, this.password));
+        if (respLogin.acceso_permitido == true) {
+          const respRefreshToken = await firstValueFrom(this._authService.refreshLogin(this.getClient(), this.email));
+          this._sessionService.setLoginData({
+            client: this.getClient().toString(),
+            email: this.email,
+            password: this.password,
+            token: (respRefreshToken && respRefreshToken.token) || 'development'
+          })
+          this.router.navigate(['/home']);
+        }
+        else {
+          if (respLogin.error_code == 6) {
+            this._toastrService.error('Esta cuenta no se encuentra autorizada', 'Error');
           }
           else {
-            if (response.error_code == 6) {
-              this._toastrService.error('Esta cuenta no se encuentra autorizada', 'Error');
-            }
-            else {
-              this._toastrService.warning('Usuario incorrecto', 'Atención');
-            }
+            this._toastrService.warning('Usuario incorrecto', 'Atención');
           }
-        },
-        error: () => {
-          this._toastrService.error('Error al validar el usuario', 'Error');
         }
-      });
+      }
+    }
+    catch (err) {
+      this._toastrService.error('Error al validar el usuario', 'Error');
     }
   }
 

@@ -5,6 +5,8 @@ import { SessionService } from '../core/services/session.service';
 import { ToastrService } from 'ngx-toastr';
 import { ArticuloService } from '../core/services/api/articulo.service';
 import { ConfigClienteService } from '../core/services/api/config_cliente.service';
+import { ConfigClient } from '../models/configClient.model';
+import { ArticleItem } from '../models/articulo.model';
 
 
 @Component({
@@ -16,7 +18,7 @@ import { ConfigClienteService } from '../core/services/api/config_cliente.servic
 export class OrderedQuantityModal implements OnInit {
 
   @Input() openModal!: Observable<void>;
-  @Input() art!: any;
+  @Input() art!: ArticleItem;
   @Output() closingAction = new EventEmitter<void>();
 
   @ViewChild('buttonOpenModal') private readonly buttonOpenModal!: ElementRef<HTMLButtonElement>;
@@ -26,7 +28,7 @@ export class OrderedQuantityModal implements OnInit {
   cantidad: number = 0;
   cantidadInput: number | null = 1;
   cliente: any;
-  configCliente = { general: null, contado: null, tarjeta: null, descuento: null };
+  configCliente: ConfigClient = { general: null, contado: null, tarjeta: null, descuento: null };
   private readonly unsubscribe$ = new Subject<void>();
 
   constructor(private _orderService: OrderService, private _sessionService: SessionService, private _toastrService: ToastrService, private _articuloService: ArticuloService, private _configClienteService: ConfigClienteService) { }
@@ -90,11 +92,11 @@ export class OrderedQuantityModal implements OnInit {
     }
   }
 
-  async calcularPrecio(articulo: any): Promise<any> {
+  async calcularPrecio(articulo: ArticleItem): Promise<any> {
     try {
       const coeficientes = await firstValueFrom(this._articuloService.getCoefArt(Number(this.cliente), articulo.CODIGO));
       let precio = { costo: 0, venta: 0, contado: 0, tarjeta: 0 };
-      precio.costo = this.twoDecimal(this.twoDecimal(articulo.PRECIO) - this.twoDecimal(articulo.PRECIO * Number(this.configCliente.descuento) / 100));
+      precio.costo = this.twoDecimal(this.twoDecimal(articulo.PRECIO) - this.twoDecimal(Number(articulo.PRECIO) * Number(this.configCliente.descuento) / 100));
       precio.venta = this.twoDecimal(this.twoDecimal(precio.costo) + this.twoDecimal((precio.costo * (coeficientes && coeficientes.Coef ? coeficientes.Coef : this.configCliente.general) / 100).toFixed(2)));
       precio.contado = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * Number(this.configCliente.contado) / 100));
       precio.tarjeta = this.twoDecimal(this.twoDecimal(precio.venta) + this.twoDecimal(precio.venta * Number(this.configCliente.tarjeta) / 100));
