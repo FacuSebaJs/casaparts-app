@@ -35,7 +35,7 @@
       </article>
     </section>
   </div>
-  <footer class="sticky-footer" *ngIf="(carrito && carrito.length) > 0">
+  <footer class="sticky-footer" *ngIf="(carrito && carrito.length) > 0 && !spinner">
     <div class="sf-total">Total: {{ total | currency:'ARS':'symbol-narrow':'1.2-2' }}</div>
     <button class="btn-primary btn-ml" [disabled]="true">Confirmar pedido</button>
   </footer>

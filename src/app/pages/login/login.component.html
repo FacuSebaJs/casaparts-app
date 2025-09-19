@@ -15,11 +15,15 @@
       </div>
       <div class="mb-3">
         <label>Password</label>
-        <input type="password" class="form-control" [(ngModel)]="password" name="password" placeholder="ingrese su password"
-          required />
+        <input type="password" class="form-control" [(ngModel)]="password" name="password"
+          placeholder="ingrese su password" required />
       </div>
-      <button type="submit" class="btn btn-warning w-100 fw-bold"
-        [disabled]="!client || !email || !password">Ingresar</button>
+      <div style="display: flex;">
+        <button type="submit" class="btn btn-warning w-100 fw-bold"
+          [disabled]="!client || !email || !password">Ingresar</button>
+        <button *ngIf="showInstallButton" type="button" class="btn btn-warning w-100 fw-bold"
+          (click)="installApp()">Instalar app</button>
+      </div>
     </form>
   </div>
 </div>
