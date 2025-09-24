@@ -4,13 +4,23 @@
     (click)="toggleMenu(false)">
     <i class="bi bi-list" style="font-size: 1.5rem;"></i>
   </button>
-  <ul class="dropdown-menu dropdown-menu-end p-2 custom-dropdown-menu" aria-labelledby="dropdownMenuButton" style="min-width: auto;">
+  <ul class="dropdown-menu dropdown-menu-end p-2 custom-dropdown-menu" aria-labelledby="dropdownMenuButton"
+    style="min-width: auto;">
+    <!-- <li>
+      <a class="dropdown-item p-1" (click)="irAlHome()">
+        <i class="material-icons-outlined icon" style="height: 100%; font-size: 32px;">home</i>
+      </a>
+    </li> -->
+    <li>
+      <a class="dropdown-item" (click)="irAlHome()">
+        <i class="material-icons-outlined" style="height: 100%; font-size: 32px;">home</i>
+      </a>
+    </li>
     <li>
       <a class="dropdown-item p-1" (click)="irAlCarrito()">
         <div style="position: relative; display: inline-block;">
           <img src="assets/images/CarritoCompras.png" alt="Carrito" class="icon-img" />
-          <span *ngIf="articulosCarrito > 0"
-            class="badge">
+          <span *ngIf="articulosCarrito > 0" class="badge">
             {{ (articulosCarrito>99) ? '99+' : articulosCarrito}}
           </span>
         </div>
@@ -23,7 +33,7 @@
     </li>
     <li class="horizontal-line">
       <a class="dropdown-item p-1" (click)="logout()">
-        <i class="material-icons icon" style="height: 100%; font-size: 32px;">logout</i>
+        <i class="material-icons-outlined icon" style="height: 100%; font-size: 32px;">logout</i>
       </a>
     </li>
   </ul>
