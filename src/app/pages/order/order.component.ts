@@ -67,6 +67,7 @@ export class OrderComponent implements OnInit, OnDestroy {
       this.spinner = true;
       await firstValueFrom(this._orderService.sendOrder(this.carrito[0].id_pedido, null));
       this.carrito = [];
+      this.router.navigate(['/home']);
     }
     catch (err) {
       console.error('Error al confirmar pedido', err);
