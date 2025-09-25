@@ -64,16 +64,8 @@ export class OrderService {
         const prepedido: boolean = false;
         const url = `${environment.API_URL}/pedido/getOrderFilter/${cliente}`;
         return this.http.get<any[]>(url).pipe(
-            switchMap(orderHeader => {
-                if (orderHeader && orderHeader.length) {
-                    return this.getOne(orderHeader[0].id).pipe(
-                        map((order: any) => {
-                            return order?.detalle || [];
-                        })
-                    );
-                } else {
-                    return of([]);
-                }
+            map((orders: any) => {
+                return orders || [];
             }),
             catchError(err => {
                 console.error('Error al obtener todos los pedidos', err);

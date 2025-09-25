@@ -40,13 +40,22 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
         this.router.navigate(['/orderDetail', id]);
     }
 
+    async allOrders(): Promise<void> {
+        this.spinner = true;
+        const cliente = this._sessionService.getClient();
+        const orders = await firstValueFrom(this._orderService.getAllOrders(cliente));
+        this.orders = orders;
+        this.spinner = false;
+    }
+
     private async latestOrders(): Promise<void> {
         const cliente = this._sessionService.getClient();
         const orders = await firstValueFrom(this._orderService.getLatestOrders(cliente));
+        console.log(orders);
         this.orders = orders;
     }
 
-    private async cargaInicial(): Promise<void> {
+    async cargaInicial(): Promise<void> {
         this.spinner = true;
         await this.latestOrders();
         this.spinner = false;
