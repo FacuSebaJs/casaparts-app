@@ -11,7 +11,7 @@ export class SessionService {
         try {
             if (response.status == 401) {
                 let message: string = 'Debe estar logueado para poder usar la aplicación';
-                localStorage.removeItem('token');
+                this.removeToken();
                 console.log(message, 'Sesión caducada');
                 this._router.navigate(['auth']);
                 return null;

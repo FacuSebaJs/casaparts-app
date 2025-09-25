@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { SocketService } from '../../core/services/socket.service';
 import { SessionService } from '../../core/services/session.service';
+import { PwaService } from '../../core/services/pwa.service';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -11,12 +13,14 @@ import { SessionService } from '../../core/services/session.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   client?: number;
   password: string;
   email: string;
+  showInstallButton = false;
+  private sub: Subscription | undefined;
 
-  constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService, private _sessionService: SessionService, private _socketService: SocketService) {
+  constructor(private router: Router, private _authService: AuthService, private _toastrService: ToastrService, private _sessionService: SessionService, private _socketService: SocketService, private _pwaService: PwaService) {
     this.client = Number(this._sessionService.getClient()) || undefined;
     this.email = this._sessionService.getEmail() || '';
     this.password = this._sessionService.getPassword() || '';
@@ -24,34 +28,47 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this._socketService.disconnect();
+    this.sub = this._pwaService.getInstallAvailableObservable()
+      .subscribe((available) => {
+        this.showInstallButton = available;
+      });
   }
 
-  ingresar(): void {
-    if (this.client && this.email && this.password) {
-      this._authService.login(this.getClient(), this.email, this.password).subscribe({
-        next: (response: any) => {
-          if (response.acceso_permitido == true) {
-            this._sessionService.setLoginData({
-              client: this.getClient().toString(),
-              email: this.email,
-              password: this.password,
-              token: response.token ? response.token : 'development'
-            })
-            this.router.navigate(['/home']);
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  installApp(): void {
+    this._pwaService.installApp();
+    this.showInstallButton = false;
+  }
+
+  async ingresar(): Promise<void> {
+    try {
+      if (this.client && this.email && this.password) {
+        const respLogin = await firstValueFrom(this._authService.login(this.getClient(), this.email, this.password));
+        if (respLogin.acceso_permitido == true) {
+          const respRefreshToken = await firstValueFrom(this._authService.refreshLogin(this.getClient(), this.email));
+          this._sessionService.setLoginData({
+            client: this.getClient().toString(),
+            email: this.email,
+            password: this.password,
+            token: (respRefreshToken && respRefreshToken.token) || 'development'
+          })
+          this.router.navigate(['/home']);
+        }
+        else {
+          if (respLogin.error_code == 6) {
+            this._toastrService.error('Esta cuenta no se encuentra autorizada', 'Error');
           }
           else {
-            if (response.error_code == 6) {
-              this._toastrService.error('Esta cuenta no se encuentra autorizada', 'Error');
-            }
-            else {
-              this._toastrService.warning('Usuario incorrecto', 'Atención');
-            }
+            this._toastrService.warning('Usuario incorrecto', 'Atención');
           }
-        },
-        error: () => {
-          this._toastrService.error('Error al validar el usuario', 'Error');
         }
-      });
+      }
+    }
+    catch (err) {
+      this._toastrService.error('Error al validar el usuario', 'Error');
     }
   }
 

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OrderItem } from '../../core/services/api/cart.service';
+import { OrderItem } from '../../models/order.model';
 import { OrderService } from '../../core/services/api/order.service';
 import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
@@ -8,6 +8,8 @@ import { ArticuloService } from '../../core/services/api/articulo.service';
 import { SocketService } from '../../core/services/socket.service';
 import { ToastrService } from 'ngx-toastr';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
+import { ConfigClient } from '../../models/configClient.model';
+import { ImageFormats } from '../../models/image.model';
 
 @Component({
   selector: 'app-order',
@@ -17,14 +19,14 @@ import { ConfigClienteService } from '../../core/services/api/config_cliente.ser
 })
 export class OrderComponent implements OnInit, OnDestroy {
   carrito: OrderItem[] = [];
-  imagenes: string[] = [];
+  imagenes: (string | null)[] = [];
   precios: number[] = [];
   total: number = 0;
   spinner: boolean = false;
   cancelador$ = new Subject<void>();
   obsChangedOrderDetail = new Subscription();
   unsubscribe$ = new Subject<void>();
-  configCliente = { general: null, contado: null, tarjeta: null, descuento: null };
+  configCliente: ConfigClient = { general: null, contado: null, tarjeta: null, descuento: null };
 
   constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService, private _configClienteService: ConfigClienteService) {
   }
@@ -129,7 +131,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     return Number(Number(value).toFixed(2));
   }
 
-  private async obtenerImagen(codigo: string): Promise<any> {
+  private async obtenerImagen(codigo: string): Promise<ImageFormats | null> {
     try {
       const imagenes = await firstValueFrom(this._articuloService.getUrlImages(codigo)
         .pipe(takeUntil(this.cancelador$)));
@@ -149,7 +151,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     try {
       for (let i = 0; i < this.carrito.length; i++) {
         const imagen = await this.obtenerImagen(this.carrito[i].articulo.CODIGO);
-        this.imagenes[i] = imagen?.formatos?.original ?? imagen;
+        this.imagenes[i] = imagen?.formatos.original ?? null;
       }
     } catch (err) {
       console.error('Error cargando imágenes', err);

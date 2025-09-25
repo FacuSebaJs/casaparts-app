@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OrderItem } from '../../core/services/api/cart.service';
 import { OrderService } from '../../core/services/api/order.service';
-import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { SocketService } from '../../core/services/socket.service';
@@ -14,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './orderHistory.component.html',
     styleUrls: ['./orderHistory.component.css']
 })
-export class OrderHistoryComponent implements OnInit, OnDestroy {
+export class OrderHistoryComponent implements OnInit {
 
     orders: any[] = [];
     spinner: boolean = false;
@@ -28,13 +27,8 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.cargaInicial();
-        // this.initSocket();
     }
 
-    ngOnDestroy(): void {
-        // this.removeListener();
-        // this.removeSockets();
-    }
 
     showDetail(id: number) {
         this.router.navigate(['/orderDetail', id]);
