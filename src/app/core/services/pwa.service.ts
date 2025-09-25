@@ -12,7 +12,6 @@ export class PwaService {
     window.addEventListener('beforeinstallprompt', (event: Event) => {
       const promptEvent = event as BeforeInstallPromptEvent;
       event.preventDefault();
-
       if (this.isMobileDevice()) {
         this.deferredPrompt = promptEvent;
         this.installAvailable$.next(true);
@@ -34,7 +33,7 @@ export class PwaService {
   }
 
   isMobileDevice(): boolean {
-    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const ua = navigator.userAgent || (window as any).opera;
     return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(ua);
   }
 
@@ -45,5 +44,4 @@ export class PwaService {
     this.deferredPrompt = null;
     this.installAvailable$.next(false);
   }
-
 }
