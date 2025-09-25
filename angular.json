@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "casa-del-renault": {
+    "casaparts": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/casa-del-renault",
+            "outputPath": "dist/casaparts",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -102,10 +102,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "casa-del-renault:build:production"
+              "buildTarget": "casaparts:build:production"
             },
             "development": {
-              "buildTarget": "casa-del-renault:build:development"
+              "buildTarget": "casaparts:build:development"
             }
           },
           "defaultConfiguration": "development"

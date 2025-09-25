@@ -1,6 +1,6 @@
 {
-  "name": "casa-del-renault",
-  "short_name": "casa-del-renault",
+  "name": "casaparts mobile",
+  "short_name": "casaparts",
   "display": "standalone",
   "scope": "/",
   "start_url": "/",

@@ -8,7 +8,7 @@ import { PwaService } from './core/services/pwa.service';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  title = 'casa-del-renault';
+  title = 'casaparts-mobile';
 
   constructor(private _pwaService: PwaService) { }
 
