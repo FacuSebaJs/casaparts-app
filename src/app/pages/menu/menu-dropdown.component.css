@@ -62,3 +62,8 @@
   position: relative;
 }
 
+@media (prefers-color-scheme: dark) {
+  .icon-img {
+    filter: invert(1) brightness(2);
+  }
+}
