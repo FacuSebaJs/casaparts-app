@@ -6,12 +6,12 @@ import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 import { HomeRoutingModule } from './home-routing.module';
 import { OrderService } from '../../core/services/api/order.service';
-import { OrderedQuantityModule } from '../../modals/orderedQuantity.module';
+import { ModalsModule } from '../../modals/modals.module';
 
 
 @NgModule({
     declarations: [HomeComponent],
-    imports: [CommonModule, FormsModule, HomeRoutingModule, OrderedQuantityModule],
+    imports: [CommonModule, FormsModule, HomeRoutingModule, ModalsModule],
     providers: [ArticuloService, ConfigClienteService, OrderService],
     exports: []
 })

@@ -1,5 +1,5 @@
 <div class="container" style="background-color: white;">
-  <h2 class="text-start">Bienvenido a CasaParts</h2>   
+  <h2 class="text-start">Bienvenido a CasaParts</h2>
   <div class="buscador">
     <input [(ngModel)]="busqueda" placeholder="Buscar artículo..." (keyup.enter)="buscar()" />
     <button type="button" (click)="buscar()">🔍</button>
@@ -8,8 +8,9 @@
   <div *ngIf="errorProductos" class="text-danger mt-2">{{ errorProductos }}</div>
   <div style="position: relative;">
     <ng-container>
-      <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
-        data-bs-interval="50000">
+      <!-- <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4" data-bs-ride="carousel"
+        [attr.data-bs-interval]="carouselTime"> -->
+        <div #carouselOfertas id="carouselOfertas" class="carousel slide mb-4">
         <div class="carousel-inner" style="width: 100%; height: auto;">
           <div *ngFor="let articulo of articulos; let i = index; trackBy: trackByIndex"
             class="carousel-item text-center" [class.active]="i === 0" style="position: relative;">
@@ -87,7 +88,8 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <div class="d-flex align-items-center">
                     <img src="assets/images/mas.png" alt="Mostrar costo" height="15px"
-                      style="margin-right: 10px; cursor: pointer;" (click)="toggleShowCost()" [class.invisible]="spinner">
+                      style="margin-right: 10px; cursor: pointer;" (click)="toggleShowCost()"
+                      [class.invisible]="spinner">
                     <span class="text-muted" [class.invisible]="!showCost">COSTO:</span>
                   </div>
                   <span class="fw-semibold text-end" [class.invisible]="!showCost">
@@ -116,7 +118,21 @@
               <button class="btn btn-dark" type="button" (click)="irAlCarrito()" [disabled]="spinner">
                 Ver pedido
               </button>
+              <button class="btn btn-dark" type="button" (click)="irAlHistorial()" [disabled]="spinner">
+                Ver historial
+              </button>
             </div>
+            <!-- <div class="sticky-footer">
+              <button class="btn btn-primary" type="button" (click)="agregarAlCarrito(articulo)" [disabled]="spinner">
+                Agregar al carrito
+              </button>
+              <button class="btn btn-dark" type="button" (click)="irAlCarrito()" [disabled]="spinner">
+                Ver pedido
+              </button>
+              <button class="btn btn-dark" type="button" (click)="irAlCarrito()" [disabled]="spinner">
+                Ver historial
+              </button>
+            </div> -->
           </div>
         </div>
       </div>

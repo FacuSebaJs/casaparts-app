@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { OrderedQuantityModal } from './orderedQuantity.modal';
+import { ConfirmationModal } from './confirmation.modal';
 
 @NgModule({
     imports: [
@@ -10,8 +10,10 @@ import { OrderedQuantityModal } from './orderedQuantity.modal';
         FormsModule
     ],
     exports: [
-        OrderedQuantityModal
+        ConfirmationModal
     ],
-    declarations: [OrderedQuantityModal]
+    declarations: [
+        ConfirmationModal
+    ]
 })
-export class OrderedQuantityModule { }
+export class ConfirmationModule { }

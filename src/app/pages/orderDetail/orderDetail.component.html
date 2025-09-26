@@ -10,7 +10,7 @@
             <div class="spinner-border text-dark" role="status">
                 <span class="visually-hidden">Cargando...</span>
             </div>
-            <p class="text-black mt-2">Cargando pedido...</p>
+            <p class="text-black mt-2">Cargando detalle...</p>
         </div>
         <section class="items" *ngIf="!spinner && order">
             <article class="item" *ngFor="let it of order.detalle; let i = index; trackBy: trackByIndex">

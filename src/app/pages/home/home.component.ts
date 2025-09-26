@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
-import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
+import { catchError, firstValueFrom, of, Subject, Subscription, takeUntil } from 'rxjs';
 import { ArticuloService } from '../../core/services/api/articulo.service';
 import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
 import { SocketService } from '../../core/services/socket.service';
@@ -22,6 +22,7 @@ import { ArticleItem } from '../../models/articulo.model';
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('carouselOfertas', { static: false }) carouselElement!: ElementRef;
   carouselInstance?: Carousel;
+  carouselTime: number = 5000;
   cargandoProductos: boolean = false;
   errorProductos: string = '';
   articulos: ArticleItem[] = [];
@@ -43,6 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   slideListener: EventListener | null = null;
   openModalOrderedQuantity = new Subject<void>();
   showCost: boolean = false;
+  timeoutHandler: any = null;
 
   constructor(private router: Router, private _articuloService: ArticuloService, private _configClienteService: ConfigClienteService, private _socketService: SocketService, private _orderService: OrderService, private _sessionService: SessionService, private _toastrService: ToastrService) {
   }
@@ -68,7 +70,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       const el = this.carouselElement?.nativeElement;
       if (el) {
-        this.carouselInstance = new Carousel(el);
+        this.carouselInstance = new Carousel(el, {
+          interval: false,
+          ride: false,
+          pause: false,
+        });
         this.slideListener = async () => {
           this.pausarCarrusel();
           const activeItem = el.querySelector('.carousel-item.active');
@@ -78,11 +84,29 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
           this.spinner = true;
           await this.actualizarDatos(currentIndex);
           this.spinner = false;
-          this.reanudarCarrusel();
         };
         el.addEventListener('slid.bs.carousel', this.slideListener);
       }
     });
+  }
+
+  advanceSlideManually() {
+    if (!this.spinner && this.carouselInstance) {
+      this.carouselInstance.next();
+    }
+  }
+
+  programarAvance() {
+    this.cleanTimeoutHandler();
+    this.timeoutHandler = setTimeout(() => {
+      this.advanceSlideManually();
+    }, this.carouselTime);
+  }
+
+  cleanTimeoutHandler() {
+    if (this.timeoutHandler) {
+      clearTimeout(this.timeoutHandler);
+    }
   }
 
   removeListener(): void {
@@ -97,14 +121,25 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async actualizarDatos(currentIndex: number) {
     if (this.articulos[currentIndex]) {
+      this.spinner = true;
+      const promesas = [];
       if (this.imagenes[currentIndex] == '') {
-        const resp = await this.obtenerImagen(currentIndex);
-        this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
+        promesas.push(
+          this.obtenerImagen(currentIndex).then(resp => {
+            this.imagenes[currentIndex] = resp?.formatos?.original ?? resp;
+          })
+        );
       }
       if (this.precios[currentIndex] == null || this.precios[currentIndex].costo == null) {
-        const precios = await this.calcularPrecio(this.articulos[currentIndex]);
-        this.precios[currentIndex] = precios;
+        promesas.push(
+          this.calcularPrecio(this.articulos[currentIndex]).then(precios => {
+            this.precios[currentIndex] = precios;
+          })
+        );
       }
+      await Promise.all(promesas);
+      this.spinner = false;
+      this.programarAvance()
     }
   }
 
@@ -114,7 +149,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     await this.cargarConfigCliente();
     await this.cargarnovedades();
     this.spinner = false;
-    this.reanudarCarrusel();
     this.initSocket();
   }
 
@@ -128,6 +162,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/order']);
   }
 
+  irAlHistorial(): void {
+    this.router.navigate(['/orderHistory']);
+  }
+
   trackByIndex = (i: number) => i;
 
   async cargarDatosVacios(articulos: any[]) {
@@ -139,6 +177,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   pausarCarrusel(): void {
     if (this.carouselInstance) {
+      this.cleanTimeoutHandler();
       this.carouselInstance.pause();
     }
     else {
@@ -157,8 +196,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async obtenerImagen(index: number): Promise<ImageFormats | null> {
     try {
-      const imagenes = await firstValueFrom(this._articuloService.getUrlImages(this.articulos[index].CODIGO)
-        .pipe(takeUntil(this.cancelador$)));
+      const imagenes = await firstValueFrom(
+        this._articuloService.getUrlImages(this.articulos[index].CODIGO).pipe(
+          takeUntil(this.cancelador$),
+          catchError(() => {
+            return of(null);
+          })
+        )
+      );
       if (imagenes && imagenes.length > 0) {
         return imagenes[0];
       } else {
@@ -175,24 +220,31 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async buscar(): Promise<void> {
-    this.pausarCarrusel();
-    if (this.busqueda == '') {
-      await this.cargarnovedades();
+    if (!this.spinner) {
+      this.pausarCarrusel();
+      if (this.busqueda == '') {
+        await this.cargarnovedades();
+      }
+      else {
+        if (this.busqueda.length > 3) {
+          await this.filtrar();
+        }
+        else {
+          this._toastrService.warning('Debe ingresar más de 3 caracteres', 'Atención');
+          this.programarAvance();
+        }
+      }
     }
-    else {
-      await this.filtrar();
-    }
-    this.reanudarCarrusel();
-    setTimeout(() => this.initCarrusel());
   }
 
   async filtrar(): Promise<void> {
     try {
       this.spinner = true;
+      this.indexImagen = 0;
       this.imagenes[this.indexImagen] = '';
+      this.precios[this.indexImagen] = null;
       const articulos = await firstValueFrom(this._articuloService.busquedaArticulo(Number(this.cliente), this.busqueda));
       await this.cargarDatosVacios(articulos);
-      console.log("ARTS:", articulos);
       this.articulos = articulos;
       await this.refreshIcon();
       await this.actualizarDatos(0);
@@ -211,6 +263,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       await this.cargarDatosVacios(articulos);
       this.articulos = articulos;
       await this.refreshIcon();
+      this.indexImagen = 0;
       await this.actualizarDatos(0);
     } catch (err) {
       console.error('Error cargando novedades', err);
@@ -349,7 +402,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   closedModal(): void {
-    this.reanudarCarrusel();
+    this.programarAvance();
     this.refreshIcon();
   }
 

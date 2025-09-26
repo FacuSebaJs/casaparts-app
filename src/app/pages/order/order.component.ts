@@ -27,6 +27,9 @@ export class OrderComponent implements OnInit, OnDestroy {
   obsChangedOrderDetail = new Subscription();
   unsubscribe$ = new Subject<void>();
   configCliente: ConfigClient = { general: null, contado: null, tarjeta: null, descuento: null };
+  selectedIndex: number = 0;
+  openModalConfirmation = new Subject<void>();
+  description: string = '';
 
   constructor(private router: Router, private _orderService: OrderService, private _sessionService: SessionService, private _articuloService: ArticuloService, private _socketService: SocketService, private _toastrService: ToastrService, private _configClienteService: ConfigClienteService) {
   }
@@ -49,18 +52,26 @@ export class OrderComponent implements OnInit, OnDestroy {
     this.removeSockets();
   }
 
-  async eliminar(index: number): Promise<void> {
-    const cliente = this._sessionService.getClient();
-    try {
-      await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[index].id));
-      this.carrito.splice(index, 1);
-      this.precios.splice(index, 1);
-      this.imagenes.splice(index, 1);
-      this.cargarTotal();
-    }
-    catch (err) {
-      console.error('Error al eliminar artículo', err);
-      throw err;
+  eliminar(index: number): void {
+    this.selectedIndex = index;
+    this.description = this.carrito[index].articulo.DESCRIP;
+    this.openModalConfirmation.next();
+  }
+
+  async confirmedAction(confirm: boolean): Promise<void> {
+    if (confirm) {
+      const cliente = this._sessionService.getClient();
+      try {
+        await firstValueFrom(this._orderService.deleteArt(cliente, this.carrito[this.selectedIndex].id));
+        this.carrito.splice(this.selectedIndex, 1);
+        this.precios.splice(this.selectedIndex, 1);
+        this.imagenes.splice(this.selectedIndex, 1);
+        this.cargarTotal();
+      }
+      catch (err) {
+        console.error('Error al eliminar artículo', err);
+        throw err;
+      }
     }
   }
 

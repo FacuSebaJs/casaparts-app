@@ -8,6 +8,8 @@
   margin: 0 auto;
   line-height: 1;
   font-size: 32px;
+  background-color: transparent;
+  color: black;
 }
 
 .icon.bi::before {
@@ -60,10 +62,4 @@
 
 .dropdown {
   position: relative;
-}
-
-@media (prefers-color-scheme: dark) {
-  .icon-img {
-    filter: invert(1) brightness(2);
-  }
 }

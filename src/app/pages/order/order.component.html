@@ -40,3 +40,6 @@
     <button type="button" class="btn-primary" (click)="confirmar()">Confirmar pedido</button>
   </footer>
 </ng-template>
+
+<app-confirmation [description]="description" [openModal]="openModalConfirmation.asObservable()"
+  (confirmingAction)="confirmedAction($event)"></app-confirmation>

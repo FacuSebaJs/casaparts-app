@@ -8,13 +8,13 @@
     style="min-width: auto;">
     <li>
       <a class="dropdown-item" (click)="irAlHome()">
-        <i class="material-icons-outlined" style="height: 100%; font-size: 32px;">home</i>
+        <i class="material-icons-outlined icon" style="height: 100%; font-size: 32px;">home</i>
       </a>
     </li>
     <li>
       <a class="dropdown-item p-1" (click)="irAlCarrito()">
-        <div style="position: relative; display: inline-block;">
-          <img src="assets/images/CarritoCompras.png" alt="Carrito" class="icon-img" />
+        <div style="position: relative; display: inline-block; background-color: transparent; color: black" class="icon">
+          <img src="assets/images/CarritoCompras.png" alt="Carrito" class="icon" />
           <span *ngIf="articulosCarrito > 0" class="badge">
             {{ (articulosCarrito>99) ? '99+' : articulosCarrito}}
           </span>

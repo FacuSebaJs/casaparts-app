@@ -1,0 +1,33 @@
+<button [hidden]="true" #buttonOpenModal type="button" class="btn btn-primary" data-bs-toggle="modal"
+    data-bs-target="#confirmationModal">
+</button>
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div *ngIf="description" class="modal-body">
+                <button hidden #buttonCloseModal type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close" (click)="close()">
+                </button>
+                <div class="mb-3 row align-items-center">
+                    <div class="col-12 col-sm-9">
+                        <div class="row" style="width: 100%; margin: 0;margin-left: 20px; margin-top: 10px;">
+                            Va a eliminar el artículo:
+                        </div>
+                        <div class="row" style="margin: 0;margin-left: 20px;">
+                            {{description}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-danger w-45" (click)="cancel()">
+                    Cerrar
+                </button>
+                <button type="button" class="btn btn-primary w-45" (click)="accept()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

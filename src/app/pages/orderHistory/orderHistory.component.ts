@@ -29,7 +29,6 @@ export class OrderHistoryComponent implements OnInit {
         this.cargaInicial();
     }
 
-
     showDetail(id: number) {
         this.router.navigate(['/orderDetail', id]);
     }
@@ -39,20 +38,25 @@ export class OrderHistoryComponent implements OnInit {
         const cliente = this._sessionService.getClient();
         const orders = await firstValueFrom(this._orderService.getAllOrders(cliente));
         this.orders = orders;
+        this.scrollTop();
         this.spinner = false;
-    }
-
-    private async latestOrders(): Promise<void> {
-        const cliente = this._sessionService.getClient();
-        const orders = await firstValueFrom(this._orderService.getLatestOrders(cliente));
-        console.log(orders);
-        this.orders = orders;
     }
 
     async cargaInicial(): Promise<void> {
         this.spinner = true;
         await this.latestOrders();
         this.spinner = false;
+    }
+
+    private async latestOrders(): Promise<void> {
+        const cliente = this._sessionService.getClient();
+        const orders = await firstValueFrom(this._orderService.getLatestOrders(cliente));
+        this.orders = orders;
+        this.scrollTop();
+    }
+
+    private scrollTop() {
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
 }

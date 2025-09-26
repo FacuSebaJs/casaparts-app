@@ -1,12 +1,12 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { firstValueFrom, fromEvent, Observable, Subject, take, takeUntil } from 'rxjs';
-import { OrderService } from '../core/services/api/order.service';
-import { SessionService } from '../core/services/session.service';
+import { OrderService } from '../../core/services/api/order.service';
+import { SessionService } from '../../core/services/session.service';
 import { ToastrService } from 'ngx-toastr';
-import { ArticuloService } from '../core/services/api/articulo.service';
-import { ConfigClienteService } from '../core/services/api/config_cliente.service';
-import { ConfigClient } from '../models/configClient.model';
-import { ArticleItem } from '../models/articulo.model';
+import { ArticuloService } from '../../core/services/api/articulo.service';
+import { ConfigClienteService } from '../../core/services/api/config_cliente.service';
+import { ConfigClient } from '../../models/configClient.model';
+import { ArticleItem } from '../../models/articulo.model';
 
 
 @Component({

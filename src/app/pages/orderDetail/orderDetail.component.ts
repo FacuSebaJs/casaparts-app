@@ -53,7 +53,6 @@ export class OrderDetailComponent implements OnInit {
             const cliente = this._sessionService.getClient();
             const order = await firstValueFrom(this._orderService.getOne(this.orderId));
             this.order = order;
-            console.log(this.order);
             if (order.id_cliente != cliente) {
                 this.redirect();
             }
