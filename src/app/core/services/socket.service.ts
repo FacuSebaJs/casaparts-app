@@ -18,19 +18,15 @@ export class SocketService {
         this.status = new Subject<Date>();
         this.lastChange = '';
     }
-
+    
     connect(): void {
         if (!this.socketStatus) {
-            const socket = this.socket.connect();
-            if (socket.connected) {
+            this.socket.connect();
+            this.socket.on('connect', () => {
                 this.socketStatus = true;
                 this.status.next(new Date());
-            }
-            else {
-                console.warn("No se pudo conectar al socket");
-            }
-        }
-        else {
+            });
+        } else {
             console.warn("Socket ya conectado");
         }
     }
@@ -59,13 +55,16 @@ export class SocketService {
     }
 
     connected(): Observable<any> {
-        this.socket.removeAllListeners();
+        this.socket.off('connected');
+        this.socket.off('disconnect');
+        this.socket.off('reconnect');
+        this.socket.off('connect_error');
         return new Observable<any>((observer) => {
             this.socket.on('connected', (message) => {
-                observer.next('message');
                 this.socketStatus = true;
                 this.lastChange = "connected";
                 this.changeDetected();
+                observer.next(message);
             });
             this.socket.on("disconnect", (reason) => {
                 console.log("socket disconnect:", reason);
@@ -79,12 +78,19 @@ export class SocketService {
                 this.lastChange = "reconnect";
                 this.changeDetected();
             });
-            this.socket.on("connect_error", () => {
-                console.log("connect_error");
+            this.socket.on("connect_error", (error) => {
+                console.log("connect_error", error);
                 this.socketStatus = false;
                 this.lastChange = "connect_error";
                 this.changeDetected();
+                observer.error(error);
             });
+            return () => {
+                this.socket.off('connected');
+                this.socket.off('disconnect');
+                this.socket.off('reconnect');
+                this.socket.off('connect_error');
+            };
         });
     }
 

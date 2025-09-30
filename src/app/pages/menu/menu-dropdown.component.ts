@@ -16,6 +16,9 @@ import { Dropdown } from 'bootstrap';
 export class MenuDropdownComponent implements OnInit {
     articulosCarrito = 0;
     cliente: any = null;
+    obsSocConnect = new Subscription();
+    obsSocRoom = new Subscription();
+    obsChangedOrder = new Subscription();
     obsChangedOrderDetail = new Subscription();
     unsubscribe$ = new Subject<void>();
     isOpen: boolean = false;
@@ -78,6 +81,15 @@ export class MenuDropdownComponent implements OnInit {
     }
 
     removeSockets(): void {
+        if (this.obsSocConnect) {
+            this.obsSocConnect.unsubscribe();
+        }
+        if (this.obsSocRoom) {
+            this.obsSocRoom.unsubscribe();
+        }
+        if (this.obsChangedOrder) {
+            this.obsChangedOrder.unsubscribe();
+        }
         if (this.obsChangedOrderDetail) {
             this.obsChangedOrderDetail.unsubscribe();
         }
@@ -103,12 +115,36 @@ export class MenuDropdownComponent implements OnInit {
 
     private initSocket(): void {
         this._socketService.connect();
-        if (this.obsChangedOrderDetail) {
-            this.obsChangedOrderDetail.unsubscribe();
-        }
-        this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
+        this.removeSockets();
+        this.obsSocConnect = this._socketService.connected()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((message) => {
+                console.info('%c' + message, 'color:Lightgreen');
+                this._socketService.connectRoom();
+            });
+        this.obsSocRoom = this._socketService.connectedRoom()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((message) => {
+                console.info('%c' + message, 'color:Lightgreen');
+            });
+        this.obsChangedOrder = this._socketService.changedOrder()
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(async (data) => {
+                const action: string = data.isNew ? 'generado' : ' actualizado';
+                let order: number = 1;
+                const response = await firstValueFrom(this._orderService.getBuyIcon(Number(this.cliente)));
+                if (data.order) {
+                    order = data.order;
+                }
+                else if (response && response.order.length) {
+                    order = response.order[0].order + 1;
+                }
+                const message: string = `Se ha ${action} el pedido N° ${order}`;
+                this._toastrService.info(message);
+            })
+        this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((data) => {
                 const action: string = data == 'agregar' ? 'agregado' : 'modificado';
                 let message: string = `Se ha ${action} artículo/s en su compra`;
                 if (data == 'quitar') {
@@ -121,8 +157,7 @@ export class MenuDropdownComponent implements OnInit {
                     this._toastrService.info(message, 'Información');
                     this.toggleMenu(true, true);
                 }
-                await this.cargarCarrito();
-                return null;
+                this.cargarCarrito();
             })
     }
 

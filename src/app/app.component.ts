@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const urlWeb: string = "https://test-casaparts.casadelrenault.com/";
+    // const urlWeb: string = "https://test-casaparts.casadelrenault.com/";
     if (!this._pwaService.isStandalone()) {
       console.log("SE REDIRECCIONA A LA WEB");
       // window.location.href = urlWeb;

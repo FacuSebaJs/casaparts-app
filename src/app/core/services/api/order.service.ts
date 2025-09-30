@@ -1,12 +1,20 @@
 import { HttpClient, } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
 export class OrderService {
+
+    private socketOrder = new Subject<void>();
+    socketOrder$ = this.socketOrder.asObservable();
+
     constructor(private http: HttpClient) { }
+
+    refreshOrder(): void {
+        this.socketOrder.next();
+    }
 
     getBuyIcon(cliente: any): Observable<{
         preOrder: any[],

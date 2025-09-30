@@ -34,9 +34,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   indexImagen: number = 0;
   cancelador$ = new Subject<void>();
   unsubscribe$ = new Subject<void>();
-  obsSocConnect = new Subscription();
-  obsSocRoom = new Subscription();
-  obsChangedOrder = new Subscription();
   obsChangedOrderDetail = new Subscription();
   cliente: any = null;
   articulosCarrito: number = 0;
@@ -311,63 +308,15 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private initSocket(): void {
-    if (this.obsSocConnect) {
-      this.obsSocConnect.unsubscribe();
-    }
-    this.obsSocConnect = this._socketService.connected()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((message) => {
-        console.info('%c' + message, 'color:Lightgreen');
-        this._socketService.connectRoom();
-      });
-    if (this.obsSocRoom) {
-      this.obsSocRoom.unsubscribe();
-    }
-    this.obsSocRoom = this._socketService.connectedRoom()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((message) => {
-        console.info('%c' + message, 'color:Lightgreen');
-      });
-    if (this.obsChangedOrder) {
-      this.obsChangedOrder.unsubscribe();
-    }
-    this.obsChangedOrder = this._socketService.changedOrder()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(async (data) => {
-        const action: string = data.isNew ? 'generado' : ' actualizado';
-        let order: number = 1;
-        const response = await firstValueFrom(this._orderService.getBuyIcon(Number(this.cliente)));
-        if (data.order) {
-          order = data.order;
-        }
-        else if (response && response.order.length) {
-          order = response.order[0].order + 1;
-        }
-        const message: string = `Se ha ${action} el pedido N° ${order}`;
-        this._toastrService.info(message);
-      })
     if (this.obsChangedOrderDetail) {
       this.obsChangedOrderDetail.unsubscribe();
     }
-    this.obsChangedOrderDetail = this._socketService.changedOrderDetail()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(async () => {
-        await this.refreshIcon();
-        return null;
-      })
-    this._socketService.connect();
+    this.obsChangedOrderDetail = this._orderService.socketOrder$.subscribe(() => {
+      this.refreshIcon();
+    })
   }
 
   removeSockets(): void {
-    if (this.obsSocConnect) {
-      this.obsSocConnect.unsubscribe();
-    }
-    if (this.obsSocRoom) {
-      this.obsSocRoom.unsubscribe();
-    }
-    if (this.obsChangedOrder) {
-      this.obsChangedOrder.unsubscribe();
-    }
     if (this.obsChangedOrderDetail) {
       this.obsChangedOrderDetail.unsubscribe();
     }

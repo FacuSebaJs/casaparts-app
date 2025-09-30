@@ -4,7 +4,6 @@ import { LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-// import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { AppRoutingModule } from './app.routes';
@@ -21,13 +20,9 @@ const socketConfig: SocketIoConfig = {
     url: environment.SOCKET_URL, options: {
         autoConnect: false,
         path: environment.SOCKET_PATH,
-        transports: [
-
-            'flashsocket',
-            'htmlfile',
+        transports: [            
             'websocket',
-            'ws',
-            'wss'
+            'polling'
         ]
     }
 };
@@ -50,7 +45,6 @@ const toastConfig: Partial<GlobalConfig> = {
         BrowserModule,
         BrowserAnimationsModule,
         AppRoutingModule,
-        // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         CoreModule,
         FormsModule,
         ReactiveFormsModule,
